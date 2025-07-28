@@ -27,6 +27,8 @@ export default function LoginPage() {
     const user = data.users.find(u => u.email === email && u.password === password);
 
     if (user) {
+      // Set a flag in localStorage to indicate the user is authenticated
+      localStorage.setItem('isAuthenticated', 'true');
       router.push('/');
     } else {
       toast({
