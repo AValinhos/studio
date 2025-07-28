@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Upload, Link, Type, Video, Loader2 } from 'lucide-react';
+import { Upload, Link, Type, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 
 type ContentType = 'image_video' | 'iframe' | 'text';
@@ -27,7 +27,6 @@ export default function ContentUploader() {
     setFile(null);
     setIframeUrl('');
     setTextContent('');
-    // Reset the file input visually
     const fileInput = document.getElementById('media-file') as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
@@ -47,12 +46,6 @@ export default function ContentUploader() {
     setIsLoading(true);
 
     try {
-      // 1. Fetch current data
-      const res = await fetch('/api/data');
-      if (!res.ok) throw new Error('Failed to fetch data');
-      const data = await res.json();
-
-      // 2. Prepare new media item
       const newId = String(Date.now());
       const newMediaItem: any = {
         id: newId,
@@ -67,10 +60,10 @@ export default function ContentUploader() {
             setIsLoading(false);
             return;
           }
-          // In a real app, you'd upload this file to a storage service (like Firebase Storage)
-          // and get a URL. For this prototype, we'll just use a placeholder.
           newMediaItem.type = file.type.startsWith('image/') ? 'Image' : 'Video';
-          newMediaItem.src = URL.createObjectURL(file); // This URL is temporary and local to the browser session
+          // NOTE: This creates a temporary blob URL. For a real app, you'd upload to a service
+          // and get a persistent URL. This approach will not work across browser sessions.
+          newMediaItem.src = URL.createObjectURL(file); 
           newMediaItem.dataAiHint = "user uploaded";
           break;
         case 'iframe':
@@ -94,17 +87,12 @@ export default function ContentUploader() {
           break;
       }
       
-      // 3. Add new item to the media list
-      const updatedMediaItems = [...data.mediaItems, newMediaItem];
-      const updatedData = { ...data, mediaItems: updatedMediaItems };
-
-      // 4. POST updated data back to the server
       const updateRes = await fetch('/api/data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updatedData),
+        body: JSON.stringify({ action: 'CREATE_MEDIA', payload: newMediaItem }),
       });
 
       if (!updateRes.ok) {
@@ -113,7 +101,7 @@ export default function ContentUploader() {
 
       toast({
         title: "Sucesso!",
-        description: "Seu conteúdo foi salvo. Atualize a página para ver as mudanças.",
+        description: "Seu conteúdo foi salvo e adicionado à biblioteca.",
       });
       resetForm();
 

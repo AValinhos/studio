@@ -11,7 +11,6 @@ async function readData() {
     return JSON.parse(fileContent);
   } catch (error) {
     console.error('Error reading data file:', error);
-    // If the file doesn't exist or is empty, return a default structure
     return { users: [], mediaItems: [], playlists: [] };
   }
 }
@@ -32,10 +31,37 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const newData = await req.json();
-    await writeData(newData);
-    return NextResponse.json({ message: 'Data updated successfully' }, { status: 200 });
+    const data = await readData();
+    const body = await req.json();
+
+    if (body.action === 'CREATE_MEDIA') {
+      data.mediaItems.push(body.payload);
+    } else if (body.action === 'UPDATE_MEDIA') {
+      data.mediaItems = data.mediaItems.map((item: any) =>
+        item.id === body.payload.id ? { ...item, ...body.payload.updates } : item
+      );
+    } else if (body.action === 'DELETE_MEDIA') {
+       // Remove the media item itself
+      data.mediaItems = data.mediaItems.filter((item: any) => item.id !== body.payload.id);
+      // Remove the media item from any playlists it's in
+      data.playlists.forEach((playlist: any) => {
+        playlist.items = playlist.items.filter((item: any) => item.mediaId !== body.payload.id);
+      });
+    } else if (body.action === 'UPDATE_PLAYLISTS') {
+      data.playlists = body.payload;
+    } else if (body.action === 'CREATE_PLAYLIST') {
+      data.playlists.push(body.payload);
+    } else if (body.action === 'UPDATE_PLAYLIST') {
+        data.playlists = data.playlists.map((p:any) => p.id === body.payload.id ? body.payload.updates : p);
+    } else if (body.action === 'DELETE_PLAYLIST') {
+        data.playlists = data.playlists.filter((p:any) => p.id !== body.payload.id);
+    } else {
+        return NextResponse.json({ message: 'Ação inválida' }, { status: 400 });
+    }
+
+    await writeData(data);
+    return NextResponse.json({ message: 'Dados atualizados com sucesso', data }, { status: 200 });
   } catch (error: any) {
-    return NextResponse.json({ message: 'Error updating data', error: error.message }, { status: 500 });
+    return NextResponse.json({ message: 'Erro ao atualizar dados', error: error.message }, { status: 500 });
   }
 }

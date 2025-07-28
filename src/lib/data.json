@@ -1,4 +1,3 @@
-
 {
   "users": [
     {
@@ -7,22 +6,78 @@
     }
   ],
   "mediaItems": [
-    { "id": "1", "name": "Welcome Video", "type": "Video", "src": "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "date": "2023-10-25" },
-    { "id": "2", "name": "Q3 Sales Dashboard", "type": "Iframe", "src": "https://time.is", "date": "2023-10-24" },
-    { "id": "3", "name": "Company Anniversary", "type": "Image", "src": "https://placehold.co/1920x1080/3F51B5/FFFFFF", "dataAiHint": "corporate office", "date": "2023-10-22" },
-    { "id": "4", "name": "Holiday Schedule", "type": "Text", "content": "Welcome to Our Company", "subContent": "We are glad to have you here.", "date": "2023-10-20" },
-    { "id": "5", "name": "New Product Launch", "type": "Image", "src": "https://placehold.co/1920x1080/81D4FA/000000", "dataAiHint": "team collaboration", "date": "2023-10-18" }
+    {
+      "id": "1",
+      "name": "Welcome Video",
+      "type": "Video",
+      "src": "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      "date": "2023-10-25"
+    },
+    {
+      "id": "2",
+      "name": "Q3 Sales Dashboard",
+      "type": "Iframe",
+      "src": "https://time.is",
+      "date": "2023-10-24"
+    },
+    {
+      "id": "3",
+      "name": "Company Anniversary",
+      "type": "Image",
+      "src": "https://placehold.co/1920x1080/3F51B5/FFFFFF",
+      "dataAiHint": "corporate office",
+      "date": "2023-10-22"
+    },
+    {
+      "id": "4",
+      "name": "Holiday Schedule",
+      "type": "Text",
+      "content": "Welcome to Our Company",
+      "subContent": "We are glad to have you here.",
+      "date": "2023-10-20"
+    },
+    {
+      "id": "5",
+      "name": "New Product Launch",
+      "type": "Image",
+      "src": "https://placehold.co/1920x1080/81D4FA/000000",
+      "dataAiHint": "team collaboration",
+      "date": "2023-10-18"
+    },
+    {
+      "id": "1753724925304",
+      "name": "sucesso",
+      "date": "2025-07-28",
+      "type": "Text",
+      "content": "sucesso internacional",
+      "subContent": "Generated from Content Uploader"
+    }
   ],
   "playlists": [
     {
       "id": "1",
       "name": "Lobby Playlist",
       "items": [
-        { "mediaId": "3", "duration": 8 },
-        { "mediaId": "4", "duration": 8 },
-        { "mediaId": "1", "duration": 20 },
-        { "mediaId": "2", "duration": 15 },
-        { "mediaId": "5", "duration": 8 }
+        {
+          "mediaId": "3",
+          "duration": 8
+        },
+        {
+          "mediaId": "4",
+          "duration": 8
+        },
+        {
+          "mediaId": "1",
+          "duration": 20
+        },
+        {
+          "mediaId": "2",
+          "duration": 15
+        },
+        {
+          "mediaId": "5",
+          "duration": 8
+        }
       ]
     }
   ]
