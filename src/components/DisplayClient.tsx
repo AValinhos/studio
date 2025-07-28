@@ -56,7 +56,17 @@ const extractSrcFromIframe = (iframeString: string): string => {
         return iframeString;
     }
     const match = iframeString.match(/src="([^"]*)"/);
-    return match ? match[1] : '';
+    // Append autoplay for YouTube/Vimeo links
+    if (match) {
+        const url = new URL(match[1]);
+        if (url.hostname.includes('youtube.com') || url.hostname.includes('vimeo.com')) {
+            url.searchParams.set('autoplay', '1');
+            url.searchParams.set('mute', '1'); // Often required for autoplay
+            return url.toString();
+        }
+        return match[1];
+    }
+    return '';
 };
 
 
@@ -152,7 +162,6 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                 {item.type.startsWith('image/') && (
                   <>
                     {item.type === 'image/gif' ? (
-                      // Use a regular <img> tag for GIFs to allow animation
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={item.src!}
@@ -161,7 +170,6 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                         data-ai-hint={item.dataAiHint}
                       />
                     ) : (
-                      // Use Next.js Image for other static images
                       <Image
                         src={item.src!}
                         alt={item.name}
@@ -169,7 +177,7 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                         height={1080}
                         className="object-contain w-full h-full"
                         data-ai-hint={item.dataAiHint}
-                        unoptimized // Recommended for external/blob URLs
+                        unoptimized
                       />
                     )}
                   </>
@@ -180,11 +188,9 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                     className="w-full h-full object-contain"
                     autoPlay
                     muted
-                    // The loop attribute is handled by the carousel's loop option.
-                    // Only loop manually if it's the only item.
                     loop={playlist.items.length === 1}
                     playsInline
-                    key={current === index ? item.src : undefined} // Force re-render on slide change to restart video
+                    key={current === index ? item.src : undefined}
                   />
                 )}
                 {item.type === 'Iframe' && (
@@ -192,7 +198,8 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                     src={extractSrcFromIframe(item.src!)}
                     className="w-full h-full border-0"
                     allowFullScreen
-                    key={item.id} // Add key for iframes to force re-render on change
+                    allow="autoplay; encrypted-media; picture-in-picture"
+                    key={item.id}
                   />
                 )}
                 {item.type === 'Text' && (
