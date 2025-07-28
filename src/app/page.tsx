@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -7,7 +8,24 @@ import ContentUploader from '@/components/ContentUploader';
 import MediaManager from '@/components/MediaManager';
 import PlaylistManager from '@/components/PlaylistManager';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { BarChart, Tv, Clapperboard, ListMusic } from 'lucide-react';
+import { BarChart, Tv, Clapperboard, ListMusic, Loader2 } from 'lucide-react';
+
+interface MediaItem {
+  id: string;
+  name: string;
+  type: string;
+  src?: string;
+  content?: string;
+  subContent?: string;
+  date: string;
+}
+
+interface Playlist {
+  id: string;
+  name: string;
+  items: any[];
+}
+
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -27,7 +45,11 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [isClient, router]);
 
   if (!isClient) {
-    return null; // Ou um spinner de carregamento
+    return (
+        <div className="flex min-h-screen w-full items-center justify-center bg-muted/40">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        </div>
+    );
   }
 
   return <>{children}</>;
@@ -35,6 +57,28 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
 
 export default function Dashboard() {
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetch('/api/data');
+        if (!res.ok) throw new Error('Falha ao buscar dados');
+        const data = await res.json();
+        setMediaItems(data.mediaItems || []);
+        setPlaylists(data.playlists || []);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <AuthGuard>
       <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -47,8 +91,8 @@ export default function Dashboard() {
                 <Tv className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">10</div>
-                <p className="text-xs text-muted-foreground">+2 desde a última semana</p>
+                <div className="text-2xl font-bold">{isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : playlists.length}</div>
+                <p className="text-xs text-muted-foreground">Cada playlist representa uma tela.</p>
               </CardContent>
             </Card>
             <Card>
@@ -57,8 +101,8 @@ export default function Dashboard() {
                 <Clapperboard className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">124</div>
-                <p className="text-xs text-muted-foreground">+15 este mês</p>
+                <div className="text-2xl font-bold">{isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : mediaItems.length}</div>
+                <p className="text-xs text-muted-foreground">Total de itens na biblioteca.</p>
               </CardContent>
             </Card>
             <Card>
@@ -67,8 +111,8 @@ export default function Dashboard() {
                 <ListMusic className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">5</div>
-                <p className="text-xs text-muted-foreground">Playlist do Lobby atualizada há 2 horas</p>
+                <div className="text-2xl font-bold">{isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : playlists.length}</div>
+                <p className="text-xs text-muted-foreground">Total de playlists criadas.</p>
               </CardContent>
             </Card>
             <Card>
