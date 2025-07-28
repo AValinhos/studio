@@ -27,6 +27,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import {
   Dialog,
@@ -247,9 +248,9 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead padding="checkbox">
+                <TableHead>
                     <Checkbox
-                        checked={selectedItems.length > 0 && selectedItems.length === filteredItems.length}
+                        checked={selectedItems.length > 0 && selectedItems.length === filteredItems.length && filteredItems.length > 0}
                         onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
                         aria-label="Selecionar todos"
                         disabled={filteredItems.length === 0}
@@ -266,7 +267,7 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
             <TableBody>
               {filteredItems.map((item) => (
                 <TableRow key={item.id} data-state={selectedItems.includes(item.id) && "selected"}>
-                   <TableCell padding="checkbox">
+                   <TableCell>
                         <Checkbox
                             checked={selectedItems.includes(item.id)}
                             onCheckedChange={(checked) => handleSelectItem(item.id, checked as boolean)}
