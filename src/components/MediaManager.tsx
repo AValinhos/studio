@@ -18,14 +18,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, FileUp } from 'lucide-react';
+import data from '@/lib/data.json';
 
-const mediaItems = [
-  { name: 'Welcome Video', type: 'Video', date: '2023-10-25' },
-  { name: 'Q3 Sales Dashboard', type: 'Iframe', date: '2023-10-24' },
-  { name: 'Company Anniversary', type: 'Image', date: '2023-10-22' },
-  { name: 'Holiday Schedule', type: 'Text', date: '2023-10-20' },
-  { name: 'New Product Launch', type: 'Image', date: '2023-10-18' },
-];
+const mediaItems = data.mediaItems;
 
 export default function MediaManager() {
   return (
@@ -86,7 +81,7 @@ export default function MediaManager() {
       </CardContent>
       <CardFooter>
         <div className="text-xs text-muted-foreground">
-          Showing <strong>1-5</strong> of <strong>{mediaItems.length}</strong> items
+          Showing <strong>1-{mediaItems.length}</strong> of <strong>{mediaItems.length}</strong> items
         </div>
       </CardFooter>
     </Card>

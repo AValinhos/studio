@@ -10,26 +10,38 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel"
 import { cn } from '@/lib/utils'
+import data from '@/lib/data.json';
 
-// Mock data, in a real app this would be fetched based on playlistId
-const mockPlaylist = {
-  id: '1',
-  name: 'Lobby Playlist',
-  items: [
-    { type: 'image', src: 'https://placehold.co/1920x1080/3F51B5/FFFFFF', duration: 8, dataAiHint: 'corporate office' },
-    { type: 'text', content: 'Welcome to Our Company', subContent: 'We are glad to have you here.', duration: 8 },
-    { type: 'video', src: 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', duration: 20 },
-    { type: 'iframe', src: 'https://time.is', duration: 15 },
-    { type: 'image', src: 'https://placehold.co/1920x1080/81D4FA/000000', duration: 8, dataAiHint: 'team collaboration' },
-  ]
+
+const getPlaylistById = (id: string) => {
+  const playlist = data.playlists.find(p => p.id === id);
+  if (!playlist) return null;
+
+  const items = playlist.items.map(item => {
+    const media = data.mediaItems.find(m => m.id === item.mediaId);
+    if (!media) return null;
+    return {
+      ...media,
+      duration: item.duration,
+    }
+  }).filter(Boolean);
+
+  return { ...playlist, items };
 }
+
 
 export default function DisplayClient({ playlistId }: { playlistId: string }) {
   const [api, setApi] = React.useState<CarouselApi>()
   const [current, setCurrent] = React.useState(0)
+  const [playlist, setPlaylist] = React.useState<any>(null);
 
   React.useEffect(() => {
-    if (!api) {
+    setPlaylist(getPlaylistById(playlistId));
+  }, [playlistId]);
+
+
+  React.useEffect(() => {
+    if (!api || !playlist) {
       return
     }
 
@@ -39,7 +51,7 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
     
     api.on("select", onSelect)
     
-    const currentItem = mockPlaylist.items[current]
+    const currentItem = playlist.items[current]
     const timer = setTimeout(() => {
       api.scrollNext()
     }, currentItem.duration * 1000)
@@ -48,17 +60,21 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
       clearTimeout(timer)
       api.off("select", onSelect)
     }
-  }, [api, current])
+  }, [api, current, playlist])
+
+  if (!playlist) {
+    return <div>Loading...</div>
+  }
 
 
   return (
     <Carousel setApi={setApi} className="w-full h-full" opts={{loop: true}}>
       <CarouselContent>
-        {mockPlaylist.items.map((item, index) => (
+        {playlist.items.map((item: any, index: number) => (
           <CarouselItem key={index}>
             <Card className="h-screen w-screen border-0 rounded-none bg-black flex items-center justify-center">
               <CardContent className="flex items-center justify-center p-0 w-full h-full">
-                {item.type === 'image' && (
+                {item.type === 'Image' && (
                   <Image
                     src={item.src}
                     alt="Playlist Image"
@@ -68,7 +84,7 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                     data-ai-hint={item.dataAiHint}
                   />
                 )}
-                {item.type === 'video' && (
+                {item.type === 'Video' && (
                   <video
                     src={item.src}
                     className="w-full h-full object-contain"
@@ -78,14 +94,14 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                     playsInline
                   />
                 )}
-                {item.type === 'iframe' && (
+                {item.type === 'Iframe' && (
                   <iframe
                     src={item.src}
                     className="w-full h-full border-0"
                     allowFullScreen
                   />
                 )}
-                {item.type === 'text' && (
+                {item.type === 'Text' && (
                    <div className="flex flex-col items-center justify-center text-center p-8 bg-gradient-to-br from-primary to-blue-800 w-full h-full">
                      <h1 className="text-7xl font-bold text-primary-foreground drop-shadow-lg">
                        {item.content}

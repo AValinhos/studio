@@ -6,18 +6,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { PlusCircle, XCircle, GripVertical } from 'lucide-react';
 import Link from 'next/link';
+import data from '@/lib/data.json';
 
-const availableMedia = [
-  { name: 'Welcome Video', type: 'Video' },
-  { name: 'Q3 Sales Dashboard', type: 'Iframe' },
-  { name: 'Company Anniversary', type: 'Image' },
-  { name: 'Holiday Schedule', type: 'Text' },
-];
+const availableMedia = data.mediaItems;
+const playlistItems = data.playlists[0].items.map(item => ({
+    ...item,
+    name: data.mediaItems.find(m => m.id === item.mediaId)?.name || 'Unknown Media'
+}));
 
-const playlistItems = [
-    { name: 'Company Anniversary', type: 'Image', duration: 10 },
-    { name: 'Welcome Video', type: 'Video', duration: 30 },
-];
 
 export default function PlaylistManager() {
   return (
