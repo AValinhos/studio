@@ -17,24 +17,23 @@ import { useToast } from "@/hooks/use-toast";
 import data from '@/lib/data.json';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const user = data.users.find(u => u.email === email && u.password === password);
+    const foundUser = data.users.find(u => u.user === user && u.password === password);
 
-    if (user) {
-      // Set a flag in localStorage to indicate the user is authenticated
+    if (foundUser) {
       localStorage.setItem('isAuthenticated', 'true');
       router.push('/');
     } else {
       toast({
         variant: "destructive",
-        title: "Login Failed",
-        description: "Invalid email or password.",
+        title: "Login Falhou",
+        description: "Usuário ou senha inválidos.",
       })
     }
   };
@@ -50,28 +49,28 @@ export default function LoginPage() {
             </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription>
-            Enter your credentials to manage Corporate TV content.
+            Entre com suas credenciais para gerenciar o conteúdo.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin}>
             <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="user">Usuário</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
+                  id="user"
+                  type="text"
+                  placeholder="admin"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={user}
+                  onChange={(e) => setUser(e.target.value)}
                 />
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">Senha</Label>
                   <a href="#" className="ml-auto inline-block text-sm underline">
-                    Forgot your password?
+                    Esqueceu sua senha?
                   </a>
                 </div>
                 <Input 
@@ -86,7 +85,7 @@ export default function LoginPage() {
                 Login
               </Button>
               <Button variant="outline" className="w-full">
-                Login with Single Sign-On
+                Login com Single Sign-On
               </Button>
             </div>
           </form>
