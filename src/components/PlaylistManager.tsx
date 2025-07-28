@@ -168,8 +168,15 @@ export default function PlaylistManager() {
               body: JSON.stringify({ action: 'UPDATE_PLAYLIST', payload: { id: selectedPlaylist.id, updates: playlistToSave } })
           });
           if (!res.ok) throw new Error('Failed to save changes');
+          const result = await res.json();
+          const updatedPlaylistFromServer = result.data.playlists.find((p: Playlist) => p.name === playlistToSave.name);
+
           toast({ title: "Sucesso!", description: "Playlist salva com sucesso." });
-          fetchData();
+          fetchData().then(() => {
+              if (updatedPlaylistFromServer) {
+                  setSelectedPlaylistId(updatedPlaylistFromServer.id);
+              }
+          });
       } catch (error) {
           console.error(error);
           toast({ variant: 'destructive', title: 'Erro', description: 'Falha ao salvar a playlist.' });
@@ -185,22 +192,26 @@ export default function PlaylistManager() {
     }
     setIsProcessing(true);
     try {
-        const newPlaylist = {
-            id: String(Date.now()),
+        const newPlaylistPayload = {
             name: newPlaylistName,
             items: []
         };
         const res = await fetch('/api/data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'CREATE_PLAYLIST', payload: newPlaylist })
+            body: JSON.stringify({ action: 'CREATE_PLAYLIST', payload: newPlaylistPayload })
         });
         if (!res.ok) throw new Error('Falha ao criar playlist');
+        const result = await res.json();
+        const createdPlaylist = result.data.playlists.find((p:Playlist) => p.name === newPlaylistName);
         toast({ title: "Sucesso!", description: "Playlist criada." });
         setNewPlaylistName('');
         setIsCreateDialogOpen(false);
-        fetchData();
-        setSelectedPlaylistId(newPlaylist.id);
+        fetchData().then(() => {
+            if (createdPlaylist) {
+                setSelectedPlaylistId(createdPlaylist.id);
+            }
+        });
     } catch (error: any) {
         toast({ variant: 'destructive', title: 'Erro', description: error.message });
     } finally {

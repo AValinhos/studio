@@ -50,7 +50,14 @@ export async function POST(req: NextRequest) {
     } else if (body.action === 'UPDATE_PLAYLISTS') {
       data.playlists = body.payload;
     } else if (body.action === 'CREATE_PLAYLIST') {
-      data.playlists.push(body.payload);
+      const newId = data.playlists.length > 0
+          ? String(Math.max(...data.playlists.map((p: any) => Number(p.id) || 0)) + 1)
+          : '1';
+      const newPlaylist = {
+          ...body.payload,
+          id: newId
+      }
+      data.playlists.push(newPlaylist);
     } else if (body.action === 'UPDATE_PLAYLIST') {
         data.playlists = data.playlists.map((p:any) => p.id === body.payload.id ? body.payload.updates : p);
     } else if (body.action === 'DELETE_PLAYLIST') {
