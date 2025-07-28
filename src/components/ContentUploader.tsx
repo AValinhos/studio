@@ -83,7 +83,7 @@ export default function ContentUploader() {
           }
           newMediaItem.type = 'Text';
           newMediaItem.content = textContent;
-          newMediaItem.subContent = "Generated from Content Uploader";
+          newMediaItem.subContent = "Gerado pelo Uploader de Conteúdo";
           break;
       }
       
@@ -96,7 +96,7 @@ export default function ContentUploader() {
       });
 
       if (!updateRes.ok) {
-        throw new Error('Failed to save content');
+        throw new Error('Falha ao salvar conteúdo');
       }
 
       toast({
@@ -120,7 +120,7 @@ export default function ContentUploader() {
   return (
     <Card className="sm:col-span-2 md:col-span-full lg:col-span-2 xl:col-span-2">
       <CardHeader>
-        <CardTitle>Content Uploader</CardTitle>
+        <CardTitle>Uploader de Conteúdo</CardTitle>
         <CardDescription>Adicione novas mídias, iframes ou texto à sua biblioteca.</CardDescription>
       </CardHeader>
       <CardContent>

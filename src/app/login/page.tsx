@@ -33,7 +33,7 @@ export default function LoginPage() {
     } else {
       toast({
         variant: "destructive",
-        title: "Login Falhou",
+        title: "Falha no Login",
         description: "Usuário ou senha inválidos.",
       })
     }
@@ -48,7 +48,7 @@ export default function LoginPage() {
                     <Tv className="h-8 w-8" />
                 </div>
             </div>
-          <CardTitle className="text-2xl">Admin Login</CardTitle>
+          <CardTitle className="text-2xl">Login do Admin</CardTitle>
           <CardDescription>
             Entre com suas credenciais para gerenciar o conteúdo.
           </CardDescription>
@@ -84,7 +84,7 @@ export default function LoginPage() {
                 />
               </div>
               <Button type="submit" className="w-full">
-                Login
+                Entrar
               </Button>
               <Button variant="outline" className="w-full">
                 Login com Single Sign-On

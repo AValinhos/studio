@@ -74,7 +74,7 @@ export default function MediaManager() {
     setIsLoading(true);
     try {
       const res = await fetch('/api/data');
-      if (!res.ok) throw new Error('Failed to fetch data');
+      if (!res.ok) throw new Error('Falha ao buscar dados');
       const data = await res.json();
       setMediaItems(data.mediaItems);
     } catch (error) {
@@ -202,7 +202,7 @@ export default function MediaManager() {
                       <DropdownMenuTrigger asChild>
                         <Button aria-haspopup="true" size="icon" variant="ghost" disabled={isProcessing}>
                           <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
+                          <span className="sr-only">Alternar menu</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">

@@ -31,17 +31,17 @@ export default function Header() {
           <span className="sr-only">Corporate TV</span>
         </Link>
         <Link href="#" className="text-foreground transition-colors hover:text-foreground font-bold">
-          Dashboard
+          Painel
         </Link>
         <Link href="/display/1" className="text-muted-foreground transition-colors hover:text-foreground">
-          Live Display
+          Tela ao Vivo
         </Link>
       </nav>
       <Sheet>
         <SheetTrigger asChild>
           <Button variant="outline" size="icon" className="shrink-0 md:hidden">
             <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle navigation menu</span>
+            <span className="sr-only">Alternar menu de navegação</span>
           </Button>
         </SheetTrigger>
         <SheetContent side="left">
@@ -51,10 +51,10 @@ export default function Header() {
               <span className="sr-only">Corporate TV</span>
             </Link>
             <Link href="#" className="hover:text-foreground">
-              Dashboard
+              Painel
             </Link>
             <Link href="/display/1" className="text-muted-foreground hover:text-foreground">
-              Live Display
+              Tela ao Vivo
             </Link>
           </nav>
         </SheetContent>
@@ -65,7 +65,7 @@ export default function Header() {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search content or playlists..."
+              placeholder="Buscar conteúdo ou playlists..."
               className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
             />
           </div>
@@ -74,16 +74,16 @@ export default function Header() {
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">
               <CircleUser className="h-5 w-5" />
-              <span className="sr-only">Toggle user menu</span>
+              <span className="sr-only">Alternar menu de usuário</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Support</DropdownMenuItem>
+            <DropdownMenuItem>Configurações</DropdownMenuItem>
+            <DropdownMenuItem>Suporte</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>Sair</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

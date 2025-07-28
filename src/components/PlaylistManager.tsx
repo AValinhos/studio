@@ -74,13 +74,13 @@ export default function PlaylistManager() {
     if (!isLoading) setIsLoading(true);
     try {
       const res = await fetch('/api/data');
-      if (!res.ok) throw new Error('Failed to fetch data');
+      if (!res.ok) throw new Error('Falha ao buscar dados');
       const jsonData = await res.json();
       
       jsonData.playlists.forEach((p: Playlist) => {
           p.items.forEach(item => {
               const media = jsonData.mediaItems.find((m: MediaItem) => m.id === item.mediaId);
-              item.name = media ? media.name : 'Unknown Media';
+              item.name = media ? media.name : 'Mídia Desconhecida';
           });
       });
       
@@ -167,7 +167,7 @@ export default function PlaylistManager() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ action: 'UPDATE_PLAYLIST', payload: { id: selectedPlaylist.id, updates: playlistToSave } })
           });
-          if (!res.ok) throw new Error('Failed to save changes');
+          if (!res.ok) throw new Error('Falha ao salvar alterações');
           const result = await res.json();
           const updatedPlaylistFromServer = result.data.playlists.find((p: Playlist) => p.name === playlistToSave.name);
 
@@ -279,10 +279,10 @@ export default function PlaylistManager() {
   return (
     <Card className="sm:col-span-2 md:col-span-full lg:col-span-2 xl:col-span-2">
       <CardHeader>
-        <CardTitle>Playlist Editor</CardTitle>
+        <CardTitle>Editor de Playlist</CardTitle>
         <CardDescription>
             {selectedPlaylist ? (
-                <>URL atual: <Link href={`/display/${selectedPlaylistId}`} className="underline text-primary">{`/display/${selectedPlaylistId}`}</Link></>
+                <>URL da Tela: <Link href={`/display/${selectedPlaylistId}`} className="underline text-primary">{`/display/${selectedPlaylistId}`}</Link></>
             ) : "Nenhuma playlist selecionada. Crie uma para começar."}
         </CardDescription>
       </CardHeader>

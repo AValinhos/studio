@@ -27,7 +27,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [isClient, router]);
 
   if (!isClient) {
-    return null; // Or a loading spinner
+    return null; // Ou um spinner de carregamento
   }
 
   return <>{children}</>;
@@ -43,22 +43,22 @@ export default function Dashboard() {
           <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Screens</CardTitle>
+                <CardTitle className="text-sm font-medium">Telas Totais</CardTitle>
                 <Tv className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">10</div>
-                <p className="text-xs text-muted-foreground">+2 since last week</p>
+                <p className="text-xs text-muted-foreground">+2 desde a última semana</p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Media Items</CardTitle>
+                <CardTitle className="text-sm font-medium">Itens de Mídia</CardTitle>
                 <Clapperboard className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">124</div>
-                <p className="text-xs text-muted-foreground">+15 this month</p>
+                <p className="text-xs text-muted-foreground">+15 este mês</p>
               </CardContent>
             </Card>
             <Card>
@@ -68,17 +68,17 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">5</div>
-                <p className="text-xs text-muted-foreground">Lobby playlist updated 2 hours ago</p>
+                <p className="text-xs text-muted-foreground">Playlist do Lobby atualizada há 2 horas</p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Content Views</CardTitle>
+                <CardTitle className="text-sm font-medium">Visualizações de Conteúdo</CardTitle>
                 <BarChart className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">+12,234</div>
-                <p className="text-xs text-muted-foreground">Most viewed: "Welcome Video"</p>
+                <p className="text-xs text-muted-foreground">Mais visto: "Vídeo de Boas-vindas"</p>
               </CardContent>
             </Card>
           </div>
@@ -91,7 +91,7 @@ export default function Dashboard() {
               <MediaManager />
             </div>
             <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-1 xl:col-span-1">
-               {/* This column can be used for other components in the future */}
+               {/* Esta coluna pode ser usada para outros componentes no futuro */}
             </div>
           </div>
         </main>

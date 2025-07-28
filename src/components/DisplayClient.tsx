@@ -62,12 +62,12 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
       setIsLoading(true);
       try {
         const res = await fetch('/api/data');
-        if (!res.ok) throw new Error('Failed to fetch data');
+        if (!res.ok) throw new Error('Falha ao buscar dados');
         const allData = await res.json();
         const foundPlaylist = getPlaylistById(playlistId, allData);
         setPlaylist(foundPlaylist);
       } catch (error) {
-        console.error("Failed to load playlist", error);
+        console.error("Falha ao carregar playlist", error);
         setPlaylist(null);
       } finally {
         setIsLoading(false);
@@ -173,7 +173,7 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                   />
                 )}
                 {item.type === 'Text' && (
-                   <div className="flex flex-col items-center justify-center text-center p-8 bg-gradient-to-br from-primary to-blue-800 w-full h-full">
+                   <div className="flex flex-col items-center justify-center text-center p-8 bg-gradient-to-br from-primary to-green-800 w-full h-full">
                      <h1 className="text-7xl font-bold text-primary-foreground drop-shadow-lg">
                        {item.content}
                      </h1>
