@@ -64,6 +64,7 @@ export default function MediaManager() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [editingItem, setEditingItem] = useState<MediaItem | null>(null);
   const [editedName, setEditedName] = useState('');
+  const [editedSrc, setEditedSrc] = useState('');
   const [editedContent, setEditedContent] = useState('');
   const [editedSubContent, setEditedSubContent] = useState('');
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -114,6 +115,8 @@ export default function MediaManager() {
     if (item.type === 'Text') {
         setEditedContent(item.content || '');
         setEditedSubContent(item.subContent || '');
+    } else if (item.type === 'Video' || item.type === 'Iframe' || item.type === 'Image') {
+        setEditedSrc(item.src || '');
     }
     setIsEditDialogOpen(true);
   };
@@ -129,6 +132,8 @@ export default function MediaManager() {
     if (editingItem.type === 'Text') {
         updates.content = editedContent;
         updates.subContent = editedSubContent;
+    } else if (editingItem.type === 'Video' || editingItem.type === 'Iframe' || editingItem.type === 'Image') {
+        updates.src = editedSrc;
     }
 
     try {
@@ -276,6 +281,14 @@ export default function MediaManager() {
                         <Textarea id="subcontent" value={editedSubContent} onChange={(e) => setEditedSubContent(e.target.value)} className="col-span-3" />
                     </div>
                   </>
+                )}
+                {(editingItem?.type === 'Video' || editingItem?.type === 'Iframe' || editingItem?.type === 'Image') && (
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="src" className="text-right">
+                            URL/Origem
+                        </Label>
+                        <Input id="src" value={editedSrc} onChange={(e) => setEditedSrc(e.target.value)} className="col-span-3" />
+                    </div>
                 )}
             </div>
             <DialogFooter>
