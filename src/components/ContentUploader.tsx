@@ -13,7 +13,11 @@ import { useToast } from "@/hooks/use-toast";
 
 type ContentType = 'image_video' | 'iframe' | 'text';
 
-export default function ContentUploader() {
+interface ContentUploaderProps {
+  onContentSaved: () => void;
+}
+
+export default function ContentUploader({ onContentSaved }: ContentUploaderProps) {
   const [activeTab, setActiveTab] = useState<ContentType>('image_video');
   const [contentName, setContentName] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -104,6 +108,7 @@ export default function ContentUploader() {
         description: "Seu conteúdo foi salvo e adicionado à biblioteca.",
       });
       resetForm();
+      onContentSaved(); // Notify parent to refresh data
 
     } catch (error: any) {
       toast({

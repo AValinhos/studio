@@ -10,20 +10,26 @@ import PlaylistManager from '@/components/PlaylistManager';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { BarChart, Tv, Clapperboard, ListMusic, Loader2 } from 'lucide-react';
 
-interface MediaItem {
+export interface MediaItem {
   id: string;
   name: string;
   type: string;
   src?: string;
   content?: string;
   subContent?: string;
+  dataAiHint?: string;
   date: string;
 }
 
-interface Playlist {
+export interface PlaylistItemData {
+  mediaId: string;
+  duration: number;
+}
+
+export interface Playlist {
   id: string;
   name: string;
-  items: any[];
+  items: PlaylistItemData[];
 }
 
 
@@ -61,21 +67,22 @@ export default function Dashboard() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchData = async () => {
+    try {
+      if (!isLoading) setIsLoading(true);
+      const res = await fetch('/api/data');
+      if (!res.ok) throw new Error('Falha ao buscar dados');
+      const data = await res.json();
+      setMediaItems(data.mediaItems || []);
+      setPlaylists(data.playlists || []);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const res = await fetch('/api/data');
-        if (!res.ok) throw new Error('Falha ao buscar dados');
-        const data = await res.json();
-        setMediaItems(data.mediaItems || []);
-        setPlaylists(data.playlists || []);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchData();
   }, []);
 
@@ -129,10 +136,15 @@ export default function Dashboard() {
           <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
             <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
               <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
-                <ContentUploader />
-                <PlaylistManager />
+                <ContentUploader onContentSaved={fetchData} />
+                <PlaylistManager 
+                  mediaItems={mediaItems} 
+                  playlists={playlists} 
+                  onPlaylistUpdate={fetchData}
+                  isLoading={isLoading}
+                />
               </div>
-              <MediaManager />
+              <MediaManager mediaItems={mediaItems} onMediaUpdate={fetchData} isLoading={isLoading}/>
             </div>
             <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-1 xl:col-span-1">
                {/* Esta coluna pode ser usada para outros componentes no futuro */}

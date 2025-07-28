@@ -47,20 +47,15 @@ import { useToast } from "@/hooks/use-toast";
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
+import { MediaItem } from '@/app/page';
 
-interface MediaItem {
-  id: string;
-  name: string;
-  type: string;
-  src?: string;
-  content?: string;
-  subContent?: string;
-  date: string;
+interface MediaManagerProps {
+  mediaItems: MediaItem[];
+  onMediaUpdate: () => void;
+  isLoading: boolean;
 }
 
-export default function MediaManager() {
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: MediaManagerProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [editingItem, setEditingItem] = useState<MediaItem | null>(null);
   const [editedName, setEditedName] = useState('');
@@ -69,28 +64,7 @@ export default function MediaManager() {
   const [editedSubContent, setEditedSubContent] = useState('');
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { toast } = useToast();
-
-  const fetchData = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch('/api/data');
-      if (!res.ok) throw new Error('Falha ao buscar dados');
-      const data = await res.json();
-      setMediaItems(data.mediaItems);
-    } catch (error) {
-      console.error(error);
-      toast({ variant: "destructive", title: "Erro", description: "Falha ao carregar a biblioteca de mídia." });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 5000); 
-    return () => clearInterval(interval);
-  }, []);
-
+  
   const handleDelete = async (itemId: string) => {
     setIsProcessing(true);
     try {
@@ -101,7 +75,7 @@ export default function MediaManager() {
       });
       if (!res.ok) throw new Error('Falha ao deletar item');
       toast({ title: "Sucesso!", description: "Item de mídia deletado." });
-      fetchData(); // Refresh data
+      onMediaUpdate(); // Refresh data
     } catch (error: any) {
       toast({ variant: "destructive", title: "Erro", description: error.message });
     } finally {
@@ -147,7 +121,7 @@ export default function MediaManager() {
       });
       if (!res.ok) throw new Error('Falha ao atualizar item');
       toast({ title: "Sucesso!", description: "Item de mídia atualizado." });
-      fetchData();
+      onMediaUpdate();
       setIsEditDialogOpen(false);
       setEditingItem(null);
     } catch (error: any) {

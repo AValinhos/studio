@@ -59,6 +59,14 @@
       "type": "Image",
       "src": "blob:https://6000-firebase-studio-1753700829316.cluster-ve345ymguzcd6qqzuko2qbxtfe.cloudworkstations.dev/1ebd6735-81b6-4efd-ae90-e6ba6125ce5e",
       "dataAiHint": "user uploaded"
+    },
+    {
+      "id": "1753727988295",
+      "name": "teste 02",
+      "date": "2025-07-28",
+      "type": "image/gif",
+      "src": "blob:https://6000-firebase-studio-1753700829316.cluster-ve345ymguzcd6qqzuko2qbxtfe.cloudworkstations.dev/9e24946c-2dc6-4337-b47f-f005b31172d3",
+      "dataAiHint": "user uploaded"
     }
   ],
   "playlists": [

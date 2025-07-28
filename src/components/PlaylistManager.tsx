@@ -32,18 +32,9 @@ import {
 } from "@/components/ui/alert-dialog"
 import Link from 'next/link';
 import { useToast } from "@/hooks/use-toast";
+import { MediaItem, Playlist as PlaylistData } from '@/app/page';
 
-interface MediaItem {
-  id: string;
-  name: string;
-  type: string;
-  src?: string;
-  content?: string;
-  subContent?: string;
-  date: string;
-}
-
-interface PlaylistItem {
+interface FullPlaylistItem {
   mediaId: string;
   duration: number;
   name: string; 
@@ -52,13 +43,19 @@ interface PlaylistItem {
 interface Playlist {
   id: string;
   name: string;
-  items: PlaylistItem[];
+  items: FullPlaylistItem[];
 }
 
-export default function PlaylistManager() {
-  const [data, setData] = useState<{ mediaItems: MediaItem[], playlists: Playlist[] } | null>(null);
+interface PlaylistManagerProps {
+    mediaItems: MediaItem[];
+    playlists: PlaylistData[];
+    onPlaylistUpdate: () => void;
+    isLoading: boolean;
+}
+
+export default function PlaylistManager({ mediaItems, playlists, onPlaylistUpdate, isLoading }: PlaylistManagerProps) {
   const [selectedPlaylistId, setSelectedPlaylistId] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [currentPlaylists, setCurrentPlaylists] = useState<Playlist[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   
@@ -69,41 +66,30 @@ export default function PlaylistManager() {
   const [editedPlaylistName, setEditedPlaylistName] = useState('');
 
   const { toast } = useToast();
-
-  const fetchData = async () => {
-    if (!isLoading) setIsLoading(true);
-    try {
-      const res = await fetch('/api/data');
-      if (!res.ok) throw new Error('Falha ao buscar dados');
-      const jsonData = await res.json();
+  
+  useEffect(() => {
+    if (!isLoading && playlists.length > 0) {
+        const fullPlaylists = playlists.map(p => ({
+            ...p,
+            items: p.items.map(item => {
+                const media = mediaItems.find(m => m.id === item.mediaId);
+                return {
+                    ...item,
+                    name: media ? media.name : 'Mídia Desconhecida'
+                };
+            })
+        }));
+        setCurrentPlaylists(fullPlaylists);
       
-      jsonData.playlists.forEach((p: Playlist) => {
-          p.items.forEach(item => {
-              const media = jsonData.mediaItems.find((m: MediaItem) => m.id === item.mediaId);
-              item.name = media ? media.name : 'Mídia Desconhecida';
-          });
-      });
-      
-      setData(jsonData);
-      if (jsonData.playlists.length > 0 && !selectedPlaylistId) {
-          setSelectedPlaylistId(jsonData.playlists[0].id);
-      } else if (jsonData.playlists.length === 0) {
+      if (!selectedPlaylistId && fullPlaylists.length > 0) {
+          setSelectedPlaylistId(fullPlaylists[0].id);
+      } else if (playlists.length === 0) {
         setSelectedPlaylistId('');
       }
-
-    } catch (error) {
-      console.error(error);
-      toast({ variant: "destructive", title: "Erro", description: "Falha ao carregar os dados." });
-    } finally {
-      setIsLoading(false);
     }
-  };
+  }, [playlists, mediaItems, isLoading, selectedPlaylistId]);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const selectedPlaylist = data?.playlists.find(p => p.id === selectedPlaylistId);
+  const selectedPlaylist = currentPlaylists.find(p => p.id === selectedPlaylistId);
 
   useEffect(() => {
     if(selectedPlaylist){
@@ -112,12 +98,12 @@ export default function PlaylistManager() {
   }, [selectedPlaylist]);
 
   const handleAddToPlaylist = (mediaId: string) => {
-    if (!data || !selectedPlaylist) return;
+    if (!selectedPlaylist) return;
 
-    const media = data.mediaItems.find(m => m.id === mediaId);
+    const media = mediaItems.find(m => m.id === mediaId);
     if (!media) return;
 
-    const newPlaylistItem: PlaylistItem = {
+    const newPlaylistItem: FullPlaylistItem = {
       mediaId,
       duration: 10,
       name: media.name,
@@ -147,13 +133,12 @@ export default function PlaylistManager() {
   };
   
   const updatePlaylistInState = (updatedPlaylist: Playlist) => {
-      if (!data) return;
-      const updatedPlaylists = data.playlists.map(p => p.id === updatedPlaylist.id ? updatedPlaylist : p);
-      setData({ ...data, playlists: updatedPlaylists });
+      const updatedPlaylists = currentPlaylists.map(p => p.id === updatedPlaylist.id ? updatedPlaylist : p);
+      setCurrentPlaylists(updatedPlaylists);
   }
 
   const handleSaveChanges = async () => {
-      if(!data || !selectedPlaylist) return;
+      if(!selectedPlaylist) return;
       setIsSaving(true);
       
       const playlistToSave = {
@@ -168,15 +153,9 @@ export default function PlaylistManager() {
               body: JSON.stringify({ action: 'UPDATE_PLAYLIST', payload: { id: selectedPlaylist.id, updates: playlistToSave } })
           });
           if (!res.ok) throw new Error('Falha ao salvar alterações');
-          const result = await res.json();
-          const updatedPlaylistFromServer = result.data.playlists.find((p: Playlist) => p.name === playlistToSave.name);
-
+          
           toast({ title: "Sucesso!", description: "Playlist salva com sucesso." });
-          fetchData().then(() => {
-              if (updatedPlaylistFromServer) {
-                  setSelectedPlaylistId(updatedPlaylistFromServer.id);
-              }
-          });
+          onPlaylistUpdate();
       } catch (error) {
           console.error(error);
           toast({ variant: 'destructive', title: 'Erro', description: 'Falha ao salvar a playlist.' });
@@ -207,11 +186,10 @@ export default function PlaylistManager() {
         toast({ title: "Sucesso!", description: "Playlist criada." });
         setNewPlaylistName('');
         setIsCreateDialogOpen(false);
-        fetchData().then(() => {
-            if (createdPlaylist) {
-                setSelectedPlaylistId(createdPlaylist.id);
-            }
-        });
+        onPlaylistUpdate();
+        if(createdPlaylist) {
+            setSelectedPlaylistId(createdPlaylist.id);
+        }
     } catch (error: any) {
         toast({ variant: 'destructive', title: 'Erro', description: error.message });
     } finally {
@@ -226,7 +204,7 @@ export default function PlaylistManager() {
     }
     setIsProcessing(true);
     try {
-        const updatedPlaylist = { ...selectedPlaylist, name: editedPlaylistName };
+        const updatedPlaylist = { ...selectedPlaylist, name: editedPlaylistName, items: selectedPlaylist.items.map(i => ({mediaId: i.mediaId, duration: i.duration})) };
         const res = await fetch('/api/data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -234,7 +212,7 @@ export default function PlaylistManager() {
         });
         if (!res.ok) throw new Error('Falha ao atualizar playlist');
         toast({ title: "Sucesso!", description: "Nome da playlist atualizado." });
-        fetchData();
+        onPlaylistUpdate();
         setIsEditDialogOpen(false);
     } catch (error: any) {
         toast({ variant: 'destructive', title: 'Erro', description: error.message });
@@ -255,7 +233,7 @@ export default function PlaylistManager() {
           if (!res.ok) throw new Error('Falha ao deletar playlist');
           toast({ title: "Sucesso!", description: "Playlist deletada." });
           setSelectedPlaylistId(''); // Reset selection
-          fetchData();
+          onPlaylistUpdate();
       } catch (error: any) {
           toast({ variant: 'destructive', title: 'Erro', description: error.message });
       } finally {
@@ -272,7 +250,7 @@ export default function PlaylistManager() {
     );
   }
 
-  const availableMedia = data?.mediaItems.filter(
+  const availableMedia = mediaItems.filter(
     media => !selectedPlaylist?.items.some(item => item.mediaId === media.id)
   ) || [];
 
@@ -288,12 +266,12 @@ export default function PlaylistManager() {
       </CardHeader>
       <CardContent className="grid gap-4">
         <div className="flex items-center gap-2">
-            <Select value={selectedPlaylistId} onValueChange={setSelectedPlaylistId} disabled={data?.playlists.length === 0}>
+            <Select value={selectedPlaylistId} onValueChange={setSelectedPlaylistId} disabled={playlists.length === 0}>
                 <SelectTrigger>
                     <SelectValue placeholder="Selecione uma playlist" />
                 </SelectTrigger>
                 <SelectContent>
-                    {data?.playlists.map(p => (
+                    {playlists.map(p => (
                     <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
                     ))}
                 </SelectContent>
