@@ -140,18 +140,32 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
           <CarouselItem key={`${item.id}-${index}`}>
             <Card className="h-screen w-screen border-0 rounded-none bg-black flex items-center justify-center">
               <CardContent className="flex items-center justify-center p-0 w-full h-full">
-                {item.type === 'Image' && (
-                  <Image
-                    src={item.src!}
-                    alt={item.name}
-                    width={1920}
-                    height={1080}
-                    className="object-contain w-full h-full"
-                    data-ai-hint={item.dataAiHint}
-                    unoptimized // Add this if you use external or non-standard image sources
-                  />
+                {item.type.startsWith('image/') && (
+                  <>
+                    {item.type === 'image/gif' ? (
+                      // Use a regular <img> tag for GIFs to allow animation
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={item.src!}
+                        alt={item.name}
+                        className="object-contain w-full h-full"
+                        data-ai-hint={item.dataAiHint}
+                      />
+                    ) : (
+                      // Use Next.js Image for other static images
+                      <Image
+                        src={item.src!}
+                        alt={item.name}
+                        width={1920}
+                        height={1080}
+                        className="object-contain w-full h-full"
+                        data-ai-hint={item.dataAiHint}
+                        unoptimized // Recommended for external/blob URLs
+                      />
+                    )}
+                  </>
                 )}
-                {item.type === 'Video' && (
+                {item.type.startsWith('video/') && (
                   <video
                     src={item.src!}
                     className="w-full h-full object-contain"

@@ -51,13 +51,26 @@
       "type": "Text",
       "content": "sucesso internacional",
       "subContent": "Generated from Content Uploader"
+    },
+    {
+      "id": "1753727716165",
+      "name": "sucesso",
+      "date": "2025-07-28",
+      "type": "Image",
+      "src": "blob:https://6000-firebase-studio-1753700829316.cluster-ve345ymguzcd6qqzuko2qbxtfe.cloudworkstations.dev/1ebd6735-81b6-4efd-ae90-e6ba6125ce5e",
+      "dataAiHint": "user uploaded"
     }
   ],
   "playlists": [
     {
       "id": "1",
       "name": "Lobby Playlist",
-      "items": []
+      "items": [
+        {
+          "mediaId": "1753727716165",
+          "duration": 10
+        }
+      ]
     },
     {
       "id": "3",

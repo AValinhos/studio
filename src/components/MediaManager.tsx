@@ -115,7 +115,7 @@ export default function MediaManager() {
     if (item.type === 'Text') {
         setEditedContent(item.content || '');
         setEditedSubContent(item.subContent || '');
-    } else if (item.type === 'Video' || item.type === 'Iframe' || item.type === 'Image') {
+    } else if (item.type.startsWith('video/') || item.type === 'Iframe' || item.type.startsWith('image/')) {
         setEditedSrc(item.src || '');
     }
     setIsEditDialogOpen(true);
@@ -132,7 +132,7 @@ export default function MediaManager() {
     if (editingItem.type === 'Text') {
         updates.content = editedContent;
         updates.subContent = editedSubContent;
-    } else if (editingItem.type === 'Video' || editingItem.type === 'Iframe' || editingItem.type === 'Image') {
+    } else if (editingItem.type.startsWith('video/') || editingItem.type === 'Iframe' || editingItem.type.startsWith('image/')) {
         updates.src = editedSrc;
     }
 
@@ -156,6 +156,14 @@ export default function MediaManager() {
       setIsProcessing(false);
     }
   };
+
+  const getBadgeText = (type: string) => {
+    if (type.startsWith('image/')) return 'Imagem';
+    if (type.startsWith('video/')) return 'Vídeo';
+    if (type === 'Iframe') return 'Iframe';
+    if (type === 'Text') return 'Texto';
+    return type;
+  }
 
   return (
     <>
@@ -194,7 +202,9 @@ export default function MediaManager() {
                 <TableRow key={item.id}>
                   <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell>
-                    <Badge variant={item.type === 'Iframe' || item.type === 'Text' ? 'secondary' : 'outline'}>{item.type}</Badge>
+                    <Badge variant={item.type === 'Iframe' || item.type === 'Text' ? 'secondary' : 'outline'}>
+                      {getBadgeText(item.type)}
+                    </Badge>
                   </TableCell>
                   <TableCell>{new Date(item.date).toLocaleDateString()}</TableCell>
                   <TableCell>
@@ -282,7 +292,7 @@ export default function MediaManager() {
                     </div>
                   </>
                 )}
-                {(editingItem?.type === 'Video' || editingItem?.type === 'Iframe' || editingItem?.type === 'Image') && (
+                {(editingItem?.type.startsWith('video/') || editingItem?.type === 'Iframe' || editingItem?.type.startsWith('image/')) && (
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="src" className="text-right">
                             URL/Origem

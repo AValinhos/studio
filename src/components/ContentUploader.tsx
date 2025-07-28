@@ -60,7 +60,7 @@ export default function ContentUploader() {
             setIsLoading(false);
             return;
           }
-          newMediaItem.type = file.type.startsWith('image/') ? 'Image' : 'Video';
+          newMediaItem.type = file.type; // Save the full MIME type
           // NOTE: This creates a temporary blob URL. For a real app, you'd upload to a service
           // and get a persistent URL. This approach will not work across browser sessions.
           newMediaItem.src = URL.createObjectURL(file); 
