@@ -47,6 +47,14 @@ export async function POST(req: NextRequest) {
       data.playlists.forEach((playlist: any) => {
         playlist.items = playlist.items.filter((item: any) => item.mediaId !== body.payload.id);
       });
+    } else if (body.action === 'BULK_DELETE_MEDIA') {
+        const idsToDelete = body.payload.ids;
+        // Remove the media items
+        data.mediaItems = data.mediaItems.filter((item: any) => !idsToDelete.includes(item.id));
+        // Remove the media items from any playlists they're in
+        data.playlists.forEach((playlist: any) => {
+            playlist.items = playlist.items.filter((item: any) => !idsToDelete.includes(item.mediaId));
+        });
     } else if (body.action === 'UPDATE_PLAYLISTS') {
       data.playlists = body.payload;
     } else if (body.action === 'CREATE_PLAYLIST') {

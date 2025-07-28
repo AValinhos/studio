@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Card,
   CardContent,
@@ -27,7 +27,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import {
   Dialog,
@@ -36,9 +35,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog"
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from '@/components/ui/dropdown-menu';
@@ -65,7 +64,25 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
   const [editedSubContent, setEditedSubContent] = useState('');
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [filterType, setFilterType] = useState('all');
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
+
+  const filteredItems = useMemo(() => {
+    return mediaItems.filter(item => {
+        if (filterType === 'all') return true;
+        if (filterType === 'image') return item.type.startsWith('image/');
+        if (filterType === 'video') return item.type.startsWith('video/');
+        if (filterType === 'iframe') return item.type === 'Iframe';
+        if (filterType === 'text') return item.type === 'Text';
+        return true;
+    });
+  }, [mediaItems, filterType]);
+
+  // Reset selection when filter changes
+  useEffect(() => {
+    setSelectedItems([]);
+  }, [filterType]);
   
   const handleDelete = async (itemId: string) => {
     setIsProcessing(true);
@@ -82,6 +99,26 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
       toast({ variant: "destructive", title: "Erro", description: error.message });
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    setIsProcessing(true);
+    try {
+        const res = await fetch('/api/data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'BULK_DELETE_MEDIA', payload: { ids: selectedItems } }),
+        });
+        if (!res.ok) throw new Error('Falha ao deletar itens');
+        toast({ title: "Sucesso!", description: `${selectedItems.length} itens de mídia deletados.` });
+        setSelectedItems([]);
+        onMediaUpdate(); // Refresh data
+    } catch (error: any) {
+        toast({ variant: "destructive", title: "Erro", description: error.message });
+    } finally {
+        setIsProcessing(false);
+        setIsBulkDeleteDialogOpen(false);
     }
   };
 
@@ -141,25 +178,45 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
     return type;
   }
   
-  const filteredItems = mediaItems.filter(item => {
-    if (filterType === 'all') return true;
-    if (filterType === 'image') return item.type.startsWith('image/');
-    if (filterType === 'video') return item.type.startsWith('video/');
-    if (filterType === 'iframe') return item.type === 'Iframe';
-    if (filterType === 'text') return item.type === 'Text';
-    return true;
-  });
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+        setSelectedItems(filteredItems.map(item => item.id));
+    } else {
+        setSelectedItems([]);
+    }
+  };
+
+  const handleSelectItem = (id: string, checked: boolean) => {
+    if (checked) {
+        setSelectedItems(prev => [...prev, id]);
+    } else {
+        setSelectedItems(prev => prev.filter(itemId => itemId !== id));
+    }
+  };
+
 
   return (
     <>
     <Card>
       <CardHeader>
-        <div className="flex flex-row justify-between items-start">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-            <CardTitle>Biblioteca de Mídia</CardTitle>
-            <CardDescription>Gerencie seu conteúdo enviado.</CardDescription>
+                <CardTitle>Biblioteca de Mídia</CardTitle>
+                <CardDescription>Gerencie seu conteúdo enviado.</CardDescription>
             </div>
-            <div className='flex items-center gap-2'>
+            <div className='flex items-center gap-2 flex-wrap'>
+                {selectedItems.length > 0 && (
+                     <Button 
+                        size="sm" 
+                        variant="destructive" 
+                        className="gap-1" 
+                        onClick={() => setIsBulkDeleteDialogOpen(true)}
+                        disabled={isProcessing}
+                    >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Deletar ({selectedItems.length})
+                    </Button>
+                )}
                 <Select value={filterType} onValueChange={setFilterType}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Filtrar por tipo" />
@@ -190,6 +247,14 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead padding="checkbox">
+                    <Checkbox
+                        checked={selectedItems.length > 0 && selectedItems.length === filteredItems.length}
+                        onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
+                        aria-label="Selecionar todos"
+                        disabled={filteredItems.length === 0}
+                    />
+                </TableHead>
                 <TableHead>Nome</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Data Adicionada</TableHead>
@@ -200,7 +265,14 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
             </TableHeader>
             <TableBody>
               {filteredItems.map((item) => (
-                <TableRow key={item.id}>
+                <TableRow key={item.id} data-state={selectedItems.includes(item.id) && "selected"}>
+                   <TableCell padding="checkbox">
+                        <Checkbox
+                            checked={selectedItems.includes(item.id)}
+                            onCheckedChange={(checked) => handleSelectItem(item.id, checked as boolean)}
+                            aria-label={`Selecionar ${item.name}`}
+                        />
+                   </TableCell>
                   <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell>
                     <Badge variant={item.type === 'Iframe' || item.type === 'Text' ? 'secondary' : 'outline'}>
@@ -261,6 +333,24 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
         </div>
       </CardFooter>
     </Card>
+
+    <AlertDialog open={isBulkDeleteDialogOpen} onOpenChange={setIsBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+            <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+            <AlertDialogDescription>
+                Essa ação não pode ser desfeita. Isso irá deletar permanentemente os {selectedItems.length} itens de mídia selecionados e removê-los de todas as playlists.
+            </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDelete} disabled={isProcessing} className="bg-destructive hover:bg-destructive/90">
+                {isProcessing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Deletar Selecionados"}
+            </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+
 
     <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">

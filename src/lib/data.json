@@ -7,13 +7,6 @@
   ],
   "mediaItems": [
     {
-      "id": "1",
-      "name": "Welcome Video",
-      "type": "Video",
-      "src": "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-      "date": "2023-10-25"
-    },
-    {
       "id": "2",
       "name": "Q3 Sales Dashboard",
       "type": "Iframe",
@@ -75,6 +68,14 @@
       "type": "image/gif",
       "src": "blob:https://6000-firebase-studio-1753700829316.cluster-ve345ymguzcd6qqzuko2qbxtfe.cloudworkstations.dev/8cf89d45-14f3-4cd3-bc73-95d812f3922f",
       "dataAiHint": "user uploaded"
+    },
+    {
+      "id": "1753728255953",
+      "name": "02 t",
+      "date": "2025-07-28",
+      "type": "image/gif",
+      "src": "blob:https://6000-firebase-studio-1753700829316.cluster-ve345ymguzcd6qqzuko2qbxtfe.cloudworkstations.dev/aafd2e9d-d838-4418-ad6f-e302f8c2fc81",
+      "dataAiHint": "user uploaded"
     }
   ],
   "playlists": [
@@ -89,6 +90,10 @@
         {
           "mediaId": "1753728133425",
           "duration": 10
+        },
+        {
+          "mediaId": "1753728255953",
+          "duration": 10
         }
       ]
     },
@@ -96,10 +101,6 @@
       "id": "3",
       "name": "xineray",
       "items": [
-        {
-          "mediaId": "1",
-          "duration": 10
-        },
         {
           "mediaId": "3",
           "duration": 10
