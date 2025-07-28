@@ -1,4 +1,10 @@
 {
+  "users": [
+    {
+      "email": "Tissue.44",
+      "password": "admin"
+    }
+  ],
   "mediaItems": [
     { "id": "1", "name": "Welcome Video", "type": "Video", "src": "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "date": "2023-10-25" },
     { "id": "2", "name": "Q3 Sales Dashboard", "type": "Iframe", "src": "https://time.is", "date": "2023-10-24" },
