@@ -46,6 +46,7 @@ import { MoreHorizontal, FileUp, Loader2, Edit, Trash2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { Textarea } from './ui/textarea';
 
 interface MediaItem {
   id: string;
@@ -63,6 +64,8 @@ export default function MediaManager() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [editingItem, setEditingItem] = useState<MediaItem | null>(null);
   const [editedName, setEditedName] = useState('');
+  const [editedContent, setEditedContent] = useState('');
+  const [editedSubContent, setEditedSubContent] = useState('');
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { toast } = useToast();
 
@@ -108,6 +111,10 @@ export default function MediaManager() {
   const handleEditClick = (item: MediaItem) => {
     setEditingItem(item);
     setEditedName(item.name);
+    if (item.type === 'Text') {
+        setEditedContent(item.content || '');
+        setEditedSubContent(item.subContent || '');
+    }
     setIsEditDialogOpen(true);
   };
 
@@ -117,13 +124,20 @@ export default function MediaManager() {
         return;
     }
     setIsProcessing(true);
+
+    const updates: Partial<MediaItem> = { name: editedName };
+    if (editingItem.type === 'Text') {
+        updates.content = editedContent;
+        updates.subContent = editedSubContent;
+    }
+
     try {
       const res = await fetch('/api/data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
             action: 'UPDATE_MEDIA', 
-            payload: { id: editingItem.id, updates: { name: editedName } } 
+            payload: { id: editingItem.id, updates } 
         }),
       });
       if (!res.ok) throw new Error('Falha ao atualizar item');
@@ -233,11 +247,11 @@ export default function MediaManager() {
     </Card>
 
     <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
             <DialogTitle>Editar Mídia</DialogTitle>
             <DialogDescription>
-                Altere o nome do seu item de mídia aqui. Clique em salvar quando terminar.
+                Altere os detalhes do seu item de mídia aqui. Clique em salvar quando terminar.
             </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -247,6 +261,22 @@ export default function MediaManager() {
                     </Label>
                     <Input id="name" value={editedName} onChange={(e) => setEditedName(e.target.value)} className="col-span-3" />
                 </div>
+                {editingItem?.type === 'Text' && (
+                  <>
+                    <div className="grid grid-cols-4 items-start gap-4">
+                        <Label htmlFor="content" className="text-right pt-2">
+                            Conteúdo
+                        </Label>
+                        <Textarea id="content" value={editedContent} onChange={(e) => setEditedContent(e.target.value)} className="col-span-3" />
+                    </div>
+                     <div className="grid grid-cols-4 items-start gap-4">
+                        <Label htmlFor="subcontent" className="text-right pt-2">
+                            Subconteúdo
+                        </Label>
+                        <Textarea id="subcontent" value={editedSubContent} onChange={(e) => setEditedSubContent(e.target.value)} className="col-span-3" />
+                    </div>
+                  </>
+                )}
             </div>
             <DialogFooter>
                 <DialogClose asChild>
