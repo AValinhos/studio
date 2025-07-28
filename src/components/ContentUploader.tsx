@@ -146,10 +146,10 @@ export default function ContentUploader() {
                     <Input 
                       id="media-file" 
                       type="file" 
-                      accept="image/*,video/mp4"
+                      accept="image/*,video/*"
                       onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
                     />
-                    <p className="text-sm text-muted-foreground">Envie arquivos JPG, PNG ou MP4.</p>
+                    <p className="text-sm text-muted-foreground">Envie arquivos de imagem (JPG, PNG, GIF, etc.) ou vídeo (MP4, WebM, etc.).</p>
                 </div>
             </TabsContent>
             <TabsContent value="iframe">
