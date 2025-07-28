@@ -67,6 +67,14 @@
       "type": "image/gif",
       "src": "blob:https://6000-firebase-studio-1753700829316.cluster-ve345ymguzcd6qqzuko2qbxtfe.cloudworkstations.dev/9e24946c-2dc6-4337-b47f-f005b31172d3",
       "dataAiHint": "user uploaded"
+    },
+    {
+      "id": "1753728133425",
+      "name": "teste 03",
+      "date": "2025-07-28",
+      "type": "image/gif",
+      "src": "blob:https://6000-firebase-studio-1753700829316.cluster-ve345ymguzcd6qqzuko2qbxtfe.cloudworkstations.dev/8cf89d45-14f3-4cd3-bc73-95d812f3922f",
+      "dataAiHint": "user uploaded"
     }
   ],
   "playlists": [
@@ -76,6 +84,10 @@
       "items": [
         {
           "mediaId": "1753727716165",
+          "duration": 10
+        },
+        {
+          "mediaId": "1753728133425",
           "duration": 10
         }
       ]

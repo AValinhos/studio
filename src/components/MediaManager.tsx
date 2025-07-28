@@ -48,6 +48,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { MediaItem } from '@/app/page';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './ui/select';
 
 interface MediaManagerProps {
   mediaItems: MediaItem[];
@@ -63,6 +64,7 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
   const [editedContent, setEditedContent] = useState('');
   const [editedSubContent, setEditedSubContent] = useState('');
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [filterType, setFilterType] = useState('all');
   const { toast } = useToast();
   
   const handleDelete = async (itemId: string) => {
@@ -138,21 +140,46 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
     if (type === 'Text') return 'Texto';
     return type;
   }
+  
+  const filteredItems = mediaItems.filter(item => {
+    if (filterType === 'all') return true;
+    if (filterType === 'image') return item.type.startsWith('image/');
+    if (filterType === 'video') return item.type.startsWith('video/');
+    if (filterType === 'iframe') return item.type === 'Iframe';
+    if (filterType === 'text') return item.type === 'Text';
+    return true;
+  });
 
   return (
     <>
     <Card>
-      <CardHeader className="flex flex-row justify-between items-start">
-        <div>
-          <CardTitle>Biblioteca de Mídia</CardTitle>
-          <CardDescription>Gerencie seu conteúdo enviado.</CardDescription>
+      <CardHeader>
+        <div className="flex flex-row justify-between items-start">
+            <div>
+            <CardTitle>Biblioteca de Mídia</CardTitle>
+            <CardDescription>Gerencie seu conteúdo enviado.</CardDescription>
+            </div>
+            <div className='flex items-center gap-2'>
+                <Select value={filterType} onValueChange={setFilterType}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Filtrar por tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">Todos os Tipos</SelectItem>
+                        <SelectItem value="image">Imagem</SelectItem>
+                        <SelectItem value="video">Vídeo</SelectItem>
+                        <SelectItem value="iframe">Iframe</SelectItem>
+                        <SelectItem value="text">Texto</SelectItem>
+                    </SelectContent>
+                </Select>
+                 <Button size="sm" variant="outline" className="gap-1" disabled>
+                    <FileUp className="h-3.5 w-3.5" />
+                    <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                        Exportar
+                    </span>
+                </Button>
+            </div>
         </div>
-        <Button size="sm" variant="outline" className="gap-1" disabled>
-          <FileUp className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-            Exportar
-          </span>
-        </Button>
       </CardHeader>
       <CardContent>
         {isLoading && mediaItems.length === 0 ? (
@@ -172,7 +199,7 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mediaItems.map((item) => (
+              {filteredItems.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell>
@@ -230,7 +257,7 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
       </CardContent>
       <CardFooter>
         <div className="text-xs text-muted-foreground">
-          Mostrando <strong>1-{mediaItems.length}</strong> de <strong>{mediaItems.length}</strong> itens
+          Mostrando <strong>1-{filteredItems.length}</strong> de <strong>{filteredItems.length}</strong> itens
         </div>
       </CardFooter>
     </Card>
