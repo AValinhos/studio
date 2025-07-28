@@ -50,6 +50,15 @@ const getPlaylistById = (id: string, allData: { mediaItems: MediaItem[], playlis
   return { ...playlistData, items };
 }
 
+const extractSrcFromIframe = (iframeString: string): string => {
+    if (!iframeString || !iframeString.includes('<iframe')) {
+        // Assume it's a direct URL if no iframe tag is present
+        return iframeString;
+    }
+    const match = iframeString.match(/src="([^"]*)"/);
+    return match ? match[1] : '';
+};
+
 
 export default function DisplayClient({ playlistId }: { playlistId: string }) {
   const [api, setApi] = React.useState<CarouselApi>()
@@ -180,7 +189,7 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                 )}
                 {item.type === 'Iframe' && (
                   <iframe
-                    src={item.src!}
+                    src={extractSrcFromIframe(item.src!)}
                     className="w-full h-full border-0"
                     allowFullScreen
                     key={item.id} // Add key for iframes to force re-render on change

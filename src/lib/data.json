@@ -38,44 +38,19 @@
       "date": "2023-10-18"
     },
     {
-      "id": "1753724925304",
-      "name": "sucesso",
-      "date": "2025-07-28",
-      "type": "Text",
-      "content": "sucesso internacional",
-      "subContent": "Generated from Content Uploader"
-    },
-    {
-      "id": "1753727716165",
-      "name": "sucesso",
-      "date": "2025-07-28",
-      "type": "Image",
-      "src": "blob:https://6000-firebase-studio-1753700829316.cluster-ve345ymguzcd6qqzuko2qbxtfe.cloudworkstations.dev/1ebd6735-81b6-4efd-ae90-e6ba6125ce5e",
-      "dataAiHint": "user uploaded"
-    },
-    {
-      "id": "1753727988295",
-      "name": "teste 02",
+      "id": "1753729515101",
+      "name": "002",
       "date": "2025-07-28",
       "type": "image/gif",
-      "src": "blob:https://6000-firebase-studio-1753700829316.cluster-ve345ymguzcd6qqzuko2qbxtfe.cloudworkstations.dev/9e24946c-2dc6-4337-b47f-f005b31172d3",
+      "src": "blob:https://6000-firebase-studio-1753700829316.cluster-ve345ymguzcd6qqzuko2qbxtfe.cloudworkstations.dev/0db96cc2-e09f-41a8-8ae0-5feb90ee2364",
       "dataAiHint": "user uploaded"
     },
     {
-      "id": "1753728133425",
-      "name": "teste 03",
+      "id": "1753729666492",
+      "name": "xineray",
       "date": "2025-07-28",
-      "type": "image/gif",
-      "src": "blob:https://6000-firebase-studio-1753700829316.cluster-ve345ymguzcd6qqzuko2qbxtfe.cloudworkstations.dev/8cf89d45-14f3-4cd3-bc73-95d812f3922f",
-      "dataAiHint": "user uploaded"
-    },
-    {
-      "id": "1753728255953",
-      "name": "02 t",
-      "date": "2025-07-28",
-      "type": "image/gif",
-      "src": "blob:https://6000-firebase-studio-1753700829316.cluster-ve345ymguzcd6qqzuko2qbxtfe.cloudworkstations.dev/aafd2e9d-d838-4418-ad6f-e302f8c2fc81",
-      "dataAiHint": "user uploaded"
+      "type": "Iframe",
+      "src": "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/4WrR52FI498?si=TCbScbYXgz8hOyt4&amp;start=157\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>"
     }
   ],
   "playlists": [
@@ -84,15 +59,11 @@
       "name": "Lobby Playlist",
       "items": [
         {
-          "mediaId": "1753727716165",
-          "duration": 10
+          "mediaId": "1753729515101",
+          "duration": 4
         },
         {
-          "mediaId": "1753728133425",
-          "duration": 10
-        },
-        {
-          "mediaId": "1753728255953",
+          "mediaId": "1753729666492",
           "duration": 10
         }
       ]
