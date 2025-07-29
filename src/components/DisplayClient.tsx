@@ -225,19 +225,24 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
               </CardContent>
             </Card>
             {item.showFooter && (
-              <div 
-                className="absolute bottom-0 left-0 right-0 p-4" 
-                style={{ backgroundColor: item.footerBgColor || 'rgba(0, 0, 0, 0.8)' }}
-              >
-                <div className="flex items-end">
-                   <div 
-                    className="font-bold uppercase inline-block px-4 py-1 text-base text-white rounded"
-                   >
-                     {item.footerText1}
-                   </div>
-                   <h2 className="text-4xl lg:text-6xl font-extrabold uppercase tracking-tighter text-white ml-4">
-                     {item.footerText2}
-                   </h2>
+              <div className="absolute bottom-0 left-0 right-0 h-28">
+                 {/* Barra principal com Texto 2 */}
+                <div 
+                    className="absolute bottom-0 left-0 right-0 p-4 h-24 flex items-center" 
+                    style={{ backgroundColor: item.footerBgColor || 'rgba(0, 0, 0, 0.8)' }}
+                >
+                    <h2 className="text-4xl lg:text-6xl font-extrabold uppercase tracking-tighter text-white ml-[20%]">
+                        {item.footerText2}
+                    </h2>
+                </div>
+                 {/* Tag sobreposta com Texto 1 */}
+                <div
+                    className="absolute top-0 left-[5%] px-4 py-2 rounded-md"
+                    style={{ backgroundColor: item.footerBgColor || 'rgba(0, 0, 0, 0.8)' }}
+                >
+                    <span className="font-bold uppercase text-xl text-white">
+                        {item.footerText1}
+                    </span>
                 </div>
               </div>
             )}
