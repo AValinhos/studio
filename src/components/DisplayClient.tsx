@@ -61,13 +61,20 @@ const extractSrcFromIframe = (iframeString: string): string => {
     }
     const match = iframeString.match(/src="([^"]*)"/);
     if (match) {
-        const url = new URL(match[1]);
-        if (url.hostname.includes('youtube.com') || url.hostname.includes('vimeo.com')) {
-            url.searchParams.set('autoplay', '1');
-            url.searchParams.set('mute', '1');
-            return url.toString();
+        try {
+            const url = new URL(match[1]);
+             if (url.hostname.includes('youtube.com') || url.hostname.includes('vimeo.com')) {
+                url.searchParams.set('autoplay', '1');
+                url.searchParams.set('mute', '1');
+                url.searchParams.set('loop', '1');
+                url.searchParams.set('playlist', url.pathname.split('/').pop() || '');
+                return url.toString();
+            }
+            return match[1];
+        } catch (error) {
+            // If URL parsing fails, it might be a malformed src, return original string or empty
+            return match[1] || '';
         }
-        return match[1];
     }
     return '';
 };
@@ -162,27 +169,15 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
             <Card className="h-screen w-screen border-0 rounded-none bg-black flex items-center justify-center">
               <CardContent className="flex items-center justify-center p-0 w-full h-full">
                 {item.type.startsWith('image/') && (
-                  <>
-                    {item.type === 'image/gif' ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={item.src!}
-                        alt={item.name}
-                        className="object-contain w-full h-full"
-                        data-ai-hint={item.dataAiHint}
-                      />
-                    ) : (
-                      <Image
-                        src={item.src!}
-                        alt={item.name}
-                        width={1920}
-                        height={1080}
-                        className="object-contain w-full h-full"
-                        data-ai-hint={item.dataAiHint}
-                        unoptimized
-                      />
-                    )}
-                  </>
+                    <Image
+                      src={item.src!}
+                      alt={item.name}
+                      width={1920}
+                      height={1080}
+                      className="object-contain w-full h-full"
+                      data-ai-hint={item.dataAiHint}
+                      unoptimized={item.type === 'image/gif'}
+                    />
                 )}
                 {item.type.startsWith('video/') && (
                   <video
@@ -201,7 +196,7 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                     className="w-full h-full border-0"
                     allowFullScreen
                     allow="autoplay; encrypted-media; picture-in-picture"
-                    key={item.id}
+                    key={`${item.id}-${current === index}`}
                   />
                 )}
                 {item.type === 'Text' && (
@@ -231,7 +226,7 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                   style={{ backgroundColor: item.footerBgColor || 'rgba(220, 38, 38, 0.9)' }}
                 >
                    <div 
-                    className="absolute left-[15%] -top-4 font-bold uppercase inline-block px-3 py-1 text-sm rounded"
+                    className="absolute left-[15%] -top-3 font-bold uppercase inline-block px-4 py-2 text-base rounded"
                     style={{ backgroundColor: item.footerBgColor || '#b91c1c', color: 'white' }}
                    >
                      {item.footerText1}

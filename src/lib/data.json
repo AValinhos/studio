@@ -83,7 +83,12 @@
       "type": "Text",
       "content": "informação do dia ",
       "subContent": "Gerado pelo Uploader de Conteúdo",
-      "bgColor": "#75228c"
+      "bgColor": "#75228c",
+      "src": "",
+      "showFooter": true,
+      "footerText1": "noticia",
+      "footerText2": "Noticia da carvalheira urgente",
+      "footerBgColor": "#53dd2c"
     }
   ],
   "playlists": [
