@@ -226,19 +226,16 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
             </Card>
             {item.showFooter && (
               <div 
-                className="absolute bottom-0 left-0 right-0" 
+                className="absolute bottom-0 left-0 right-0 p-4" 
+                style={{ backgroundColor: item.footerBgColor || 'rgba(0, 0, 0, 0.8)' }}
               >
-                <div
-                  className="relative p-4 text-white flex items-center justify-center"
-                  style={{ backgroundColor: item.footerBgColor || 'rgba(0, 0, 0, 0.8)' }}
-                >
+                <div className="flex items-end">
                    <div 
-                    className="absolute left-[5%] -top-4 font-bold uppercase inline-block px-4 py-1 text-base rounded"
-                    style={{ backgroundColor: item.footerBgColor || 'rgba(0, 0, 0, 0.8)', color: 'white' }}
+                    className="font-bold uppercase inline-block px-4 py-1 text-base text-white rounded"
                    >
                      {item.footerText1}
                    </div>
-                   <h2 className="text-4xl lg:text-6xl font-extrabold uppercase tracking-tighter w-full text-center">
+                   <h2 className="text-4xl lg:text-6xl font-extrabold uppercase tracking-tighter text-white ml-4">
                      {item.footerText2}
                    </h2>
                 </div>
