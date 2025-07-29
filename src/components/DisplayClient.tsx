@@ -229,12 +229,12 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                 className="absolute bottom-0 left-0 right-0" 
               >
                 <div
-                  className="relative p-4 text-white flex items-center"
-                  style={{ backgroundColor: item.footerBgColor || 'rgba(220, 38, 38, 0.9)' }}
+                  className="relative p-4 text-white flex items-center justify-center"
+                  style={{ backgroundColor: item.footerBgColor || 'rgba(0, 0, 0, 0.8)' }}
                 >
                    <div 
-                    className="absolute left-[15%] -top-4 font-bold uppercase inline-block px-4 py-1 text-base rounded"
-                    style={{ backgroundColor: item.footerBgColor || '#b91c1c', color: 'white' }}
+                    className="absolute left-[5%] -top-4 font-bold uppercase inline-block px-4 py-1 text-base rounded"
+                    style={{ backgroundColor: item.footerBgColor || 'rgba(0, 0, 0, 0.8)', color: 'white' }}
                    >
                      {item.footerText1}
                    </div>
