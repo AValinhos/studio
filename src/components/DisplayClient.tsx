@@ -56,27 +56,47 @@ const getPlaylistById = (id: string, allData: { mediaItems: MediaItem[], playlis
 }
 
 const extractSrcFromIframe = (iframeString: string): string => {
-    if (!iframeString || !iframeString.includes('<iframe')) {
-        return iframeString;
-    }
-    const match = iframeString.match(/src="([^"]*)"/);
-    if (match) {
-        try {
-            const url = new URL(match[1]);
-             if (url.hostname.includes('youtube.com') || url.hostname.includes('vimeo.com')) {
-                url.searchParams.set('autoplay', '1');
-                url.searchParams.set('mute', '1');
-                url.searchParams.set('loop', '1');
-                url.searchParams.set('playlist', url.pathname.split('/').pop() || '');
-                return url.toString();
-            }
-            return match[1];
-        } catch (error) {
-            // If URL parsing fails, it might be a malformed src, return original string or empty
-            return match[1] || '';
+    let urlString = iframeString;
+
+    if (iframeString.includes('<iframe')) {
+        const match = iframeString.match(/src="([^"]*)"/);
+        if (match) {
+            urlString = match[1];
+        } else {
+            return ''; // No src found in iframe tag
         }
     }
-    return '';
+
+    try {
+        const url = new URL(urlString);
+        if (url.hostname.includes('youtube.com') || url.hostname.includes('youtu.be')) {
+            // Parâmetros para uma experiência de TV corporativa
+            url.searchParams.set('autoplay', '1');
+            url.searchParams.set('mute', '1');
+            url.searchParams.set('loop', '1');
+            // A API de loop do YouTube requer que o ID do vídeo seja especificado na playlist
+            const videoId = url.pathname.split('/').pop();
+            if (videoId) {
+                url.searchParams.set('playlist', videoId);
+            }
+            // Parâmetros para customização da interface
+            url.searchParams.set('modestbranding', '1'); // Remove logo do YouTube
+            url.searchParams.set('rel', '0'); // Não mostra vídeos relacionados
+            url.searchParams.set('controls', '0'); // Oculta controles
+            url.searchParams.set('disablekb', '1'); // Desativa teclado
+            return url.toString();
+        }
+        if (url.hostname.includes('vimeo.com')) {
+             url.searchParams.set('autoplay', '1');
+             url.searchParams.set('muted', '1'); // Vimeo usa 'muted'
+             url.search_params.set('loop', '1');
+             return url.toString();
+        }
+        return url.toString();
+    } catch (error) {
+        // Se a criação da URL falhar, pode não ser uma URL válida. Retorne o original.
+        return urlString;
+    }
 };
 
 
@@ -226,23 +246,24 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
             </Card>
             {item.showFooter && (
               <div className="absolute bottom-0 left-0 right-0 h-28">
-                 {/* Barra principal com Texto 2 */}
-                <div 
-                    className="absolute bottom-0 left-0 right-0 p-4 h-24 flex items-center" 
-                    style={{ backgroundColor: item.footerBgColor || 'rgba(0, 0, 0, 0.8)' }}
-                >
-                    <h2 className="text-4xl lg:text-6xl font-extrabold uppercase tracking-tighter text-white ml-[20%]">
-                        {item.footerText2}
-                    </h2>
-                </div>
-                 {/* Tag sobreposta com Texto 1 */}
                 <div
                     className="absolute top-0 left-[5%] px-4 py-2 rounded-md"
-                    style={{ backgroundColor: item.footerBgColor || 'rgba(0, 0, 0, 0.8)' }}
+                    style={{ 
+                      backgroundColor: item.footerBgColor || 'rgba(0, 0, 0, 0.8)',
+                      transform: 'translateY(-50%)' // Move a tag para cima
+                    }}
                 >
                     <span className="font-bold uppercase text-xl text-white">
                         {item.footerText1}
                     </span>
+                </div>
+                <div 
+                    className="absolute bottom-0 left-0 right-0 p-4 h-24 flex items-center" 
+                    style={{ backgroundColor: item.footerBgColor || 'rgba(0, 0, 0, 0.8)' }}
+                >
+                    <h2 className="text-4xl lg:text-6xl font-extrabold uppercase tracking-tighter text-white ml-[5%]">
+                        {item.footerText2}
+                    </h2>
                 </div>
               </div>
             )}
