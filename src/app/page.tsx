@@ -19,6 +19,10 @@ export interface MediaItem {
   subContent?: string;
   dataAiHint?: string;
   date: string;
+  showFooter?: boolean;
+  footerText1?: string;
+  footerText2?: string;
+  footerBgColor?: string;
 }
 
 export interface PlaylistItemData {

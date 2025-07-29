@@ -49,6 +49,8 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { MediaItem } from '@/app/page';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './ui/select';
+import { Separator } from './ui/separator';
+import { Switch } from './ui/switch';
 
 interface MediaManagerProps {
   mediaItems: MediaItem[];
@@ -59,10 +61,16 @@ interface MediaManagerProps {
 export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: MediaManagerProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [editingItem, setEditingItem] = useState<MediaItem | null>(null);
+  
   const [editedName, setEditedName] = useState('');
   const [editedSrc, setEditedSrc] = useState('');
   const [editedContent, setEditedContent] = useState('');
   const [editedSubContent, setEditedSubContent] = useState('');
+  const [showFooter, setShowFooter] = useState(false);
+  const [footerText1, setFooterText1] = useState('');
+  const [footerText2, setFooterText2] = useState('');
+  const [footerBgColor, setFooterBgColor] = useState('#dc2626');
+
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [filterType, setFilterType] = useState('all');
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -80,7 +88,6 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
     });
   }, [mediaItems, filterType]);
 
-  // Reset selection when filter changes
   useEffect(() => {
     setSelectedItems([]);
   }, [filterType]);
@@ -95,7 +102,7 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
       });
       if (!res.ok) throw new Error('Falha ao deletar item');
       toast({ title: "Sucesso!", description: "Item de mídia deletado." });
-      onMediaUpdate(); // Refresh data
+      onMediaUpdate();
     } catch (error: any) {
       toast({ variant: "destructive", title: "Erro", description: error.message });
     } finally {
@@ -114,7 +121,7 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
         if (!res.ok) throw new Error('Falha ao deletar itens');
         toast({ title: "Sucesso!", description: `${selectedItems.length} itens de mídia deletados.` });
         setSelectedItems([]);
-        onMediaUpdate(); // Refresh data
+        onMediaUpdate();
     } catch (error: any) {
         toast({ variant: "destructive", title: "Erro", description: error.message });
     } finally {
@@ -126,12 +133,13 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
   const handleEditClick = (item: MediaItem) => {
     setEditingItem(item);
     setEditedName(item.name);
-    if (item.type === 'Text') {
-        setEditedContent(item.content || '');
-        setEditedSubContent(item.subContent || '');
-    } else if (item.type.startsWith('video/') || item.type === 'Iframe' || item.type.startsWith('image/')) {
-        setEditedSrc(item.src || '');
-    }
+    setEditedSrc(item.src || '');
+    setEditedContent(item.content || '');
+    setEditedSubContent(item.subContent || '');
+    setShowFooter(item.showFooter || false);
+    setFooterText1(item.footerText1 || '');
+    setFooterText2(item.footerText2 || '');
+    setFooterBgColor(item.footerBgColor || '#dc2626');
     setIsEditDialogOpen(true);
   };
 
@@ -142,13 +150,16 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
     }
     setIsProcessing(true);
 
-    const updates: Partial<MediaItem> = { name: editedName };
-    if (editingItem.type === 'Text') {
-        updates.content = editedContent;
-        updates.subContent = editedSubContent;
-    } else if (editingItem.type.startsWith('video/') || editingItem.type === 'Iframe' || editingItem.type.startsWith('image/')) {
-        updates.src = editedSrc;
-    }
+    const updates: Partial<MediaItem> = { 
+        name: editedName,
+        src: editedSrc,
+        content: editedContent,
+        subContent: editedSubContent,
+        showFooter: showFooter,
+        footerText1: footerText1,
+        footerText2: footerText2,
+        footerBgColor: footerBgColor,
+    };
 
     try {
       const res = await fetch('/api/data', {
@@ -352,46 +363,67 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
         </AlertDialogContent>
     </AlertDialog>
 
-
     <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-            <DialogTitle>Editar Mídia</DialogTitle>
-            <DialogDescription>
-                Altere os detalhes do seu item de mídia aqui. Clique em salvar quando terminar.
-            </DialogDescription>
+                <DialogTitle>Editar Mídia</DialogTitle>
+                <DialogDescription>
+                    Altere os detalhes do seu item de mídia aqui. Clique em salvar quando terminar.
+                </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
+            <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto pr-4">
                 <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                        Nome
-                    </Label>
+                    <Label htmlFor="name" className="text-right">Nome</Label>
                     <Input id="name" value={editedName} onChange={(e) => setEditedName(e.target.value)} className="col-span-3" />
                 </div>
-                {editingItem?.type === 'Text' && (
+                
+                {editingItem?.type === 'Text' ? (
                   <>
                     <div className="grid grid-cols-4 items-start gap-4">
-                        <Label htmlFor="content" className="text-right pt-2">
-                            Conteúdo
-                        </Label>
+                        <Label htmlFor="content" className="text-right pt-2">Conteúdo</Label>
                         <Textarea id="content" value={editedContent} onChange={(e) => setEditedContent(e.target.value)} className="col-span-3" />
                     </div>
                      <div className="grid grid-cols-4 items-start gap-4">
-                        <Label htmlFor="subcontent" className="text-right pt-2">
-                            Subconteúdo
-                        </Label>
+                        <Label htmlFor="subcontent" className="text-right pt-2">Subconteúdo</Label>
                         <Textarea id="subcontent" value={editedSubContent} onChange={(e) => setEditedSubContent(e.target.value)} className="col-span-3" />
                     </div>
                   </>
-                )}
-                {(editingItem?.type.startsWith('video/') || editingItem?.type === 'Iframe' || editingItem?.type.startsWith('image/')) && (
+                ) : (
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="src" className="text-right">
-                            URL/Origem
-                        </Label>
-                        <Input id="src" value={editedSrc} onChange={(e) => setEditedSrc(e.target.value)} className="col-span-3" />
+                        <Label htmlFor="src" className="text-right">URL/Origem</Label>
+                        <Textarea id="src" value={editedSrc} onChange={(e) => setEditedSrc(e.target.value)} className="col-span-3" />
                     </div>
                 )}
+
+                <Separator className="my-4" />
+
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
+                        <div className="space-y-0.5">
+                            <Label>Mostrar Rodapé</Label>
+                            <DialogDescription>Ative para exibir um rodapé sobre este item.</DialogDescription>
+                        </div>
+                        <Switch checked={showFooter} onCheckedChange={setShowFooter} />
+                    </div>
+
+                    {showFooter && (
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="footer-text1" className="text-right">Texto 1</Label>
+                                <Input id="footer-text1" value={footerText1} onChange={(e) => setFooterText1(e.target.value)} className="col-span-3" placeholder="Ex: URGENTE"/>
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="footer-text2" className="text-right">Texto 2</Label>
+                                <Input id="footer-text2" value={footerText2} onChange={(e) => setFooterText2(e.target.value)} className="col-span-3" placeholder="Ex: NOTÍCIA DE ÚLTIMA HORA"/>
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="footer-bgcolor" className="text-right">Cor de Fundo</Label>
+                                <Input id="footer-bgcolor" type="color" value={footerBgColor} onChange={(e) => setFooterBgColor(e.target.value)} className="col-span-3 p-1 h-10"/>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
             </div>
             <DialogFooter>
                 <DialogClose asChild>

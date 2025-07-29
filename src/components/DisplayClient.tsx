@@ -21,6 +21,10 @@ interface MediaItem {
   subContent?: string;
   dataAiHint?: string;
   date: string;
+  showFooter?: boolean;
+  footerText1?: string;
+  footerText2?: string;
+  footerBgColor?: string;
 }
 
 interface PlaylistItemData {
@@ -52,16 +56,14 @@ const getPlaylistById = (id: string, allData: { mediaItems: MediaItem[], playlis
 
 const extractSrcFromIframe = (iframeString: string): string => {
     if (!iframeString || !iframeString.includes('<iframe')) {
-        // Assume it's a direct URL if no iframe tag is present
         return iframeString;
     }
     const match = iframeString.match(/src="([^"]*)"/);
-    // Append autoplay for YouTube/Vimeo links
     if (match) {
         const url = new URL(match[1]);
         if (url.hostname.includes('youtube.com') || url.hostname.includes('vimeo.com')) {
             url.searchParams.set('autoplay', '1');
-            url.searchParams.set('mute', '1'); // Often required for autoplay
+            url.searchParams.set('mute', '1');
             return url.toString();
         }
         return match[1];
@@ -110,7 +112,6 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
     
     const currentItem = playlist.items[current]
     const timer = setTimeout(() => {
-      // Check if carousel is still mounted and has items
       if (api.scrollSnapList().length > 0) {
          api.scrollNext()
       }
@@ -156,7 +157,7 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
     <Carousel setApi={setApi} className="w-full h-full" opts={{loop: true}}>
       <CarouselContent>
         {playlist.items.map((item, index) => (
-          <CarouselItem key={`${item.id}-${index}`}>
+          <CarouselItem key={`${item.id}-${index}`} className="relative">
             <Card className="h-screen w-screen border-0 rounded-none bg-black flex items-center justify-center">
               <CardContent className="flex items-center justify-center p-0 w-full h-full">
                 {item.type.startsWith('image/') && (
@@ -214,6 +215,19 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                 )}
               </CardContent>
             </Card>
+            {item.showFooter && (
+              <div 
+                className="absolute bottom-0 left-0 right-0 p-4 text-white" 
+                style={{ backgroundColor: item.footerBgColor || 'rgba(220, 38, 38, 0.9)' }}
+              >
+                <div className="bg-white text-black font-bold uppercase inline-block px-3 py-1 text-sm mb-2 rounded">
+                  {item.footerText1}
+                </div>
+                <h2 className="text-4xl lg:text-6xl font-extrabold uppercase tracking-tighter">
+                  {item.footerText2}
+                </h2>
+              </div>
+            )}
           </CarouselItem>
         ))}
       </CarouselContent>

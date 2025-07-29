@@ -11,87 +11,100 @@
       "name": "Q3 Sales Dashboard",
       "type": "Iframe",
       "src": "https://time.is",
-      "date": "2023-10-24"
+      "date": "2023-10-24",
+      "showFooter": false,
+      "footerText1": "",
+      "footerText2": "",
+      "footerBgColor": "#dc2626"
     },
     {
       "id": "3",
       "name": "Company Anniversary",
-      "type": "Image",
-      "src": "https://placehold.co/1920x1080/3F51B5/FFFFFF",
+      "type": "image/jpeg",
+      "src": "https://placehold.co/1920x1080/228B22/FFFFFF",
       "dataAiHint": "corporate office",
-      "date": "2023-10-22"
+      "date": "2023-10-22",
+      "showFooter": true,
+      "footerText1": "ANIVERSÁRIO",
+      "footerText2": "10 ANOS DE SUCESSO",
+      "footerBgColor": "rgba(34, 139, 34, 0.9)"
     },
     {
       "id": "4",
       "name": "Holiday Schedule",
       "type": "Text",
-      "content": "bem vindo",
-      "subContent": "carvalheira papeis",
-      "date": "2023-10-20"
+      "content": "Bem-vindo",
+      "subContent": "Carvalheira Papéis",
+      "date": "2023-10-20",
+      "showFooter": false,
+      "footerText1": "",
+      "footerText2": "",
+      "footerBgColor": "#dc2626"
     },
     {
       "id": "5",
       "name": "New Product Launch",
-      "type": "Image",
-      "src": "https://placehold.co/1920x1080/81D4FA/000000",
+      "type": "image/png",
+      "src": "https://placehold.co/1920x1080/90EE90/000000",
       "dataAiHint": "team collaboration",
-      "date": "2023-10-18"
+      "date": "2023-10-18",
+      "showFooter": false,
+      "footerText1": "",
+      "footerText2": "",
+      "footerBgColor": "#dc2626"
     },
     {
-      "id": "1753729515101",
-      "name": "002",
+      "id": "1753729970729",
+      "name": "GIF animado",
       "date": "2025-07-28",
       "type": "image/gif",
-      "src": "blob:https://6000-firebase-studio-1753700829316.cluster-ve345ymguzcd6qqzuko2qbxtfe.cloudworkstations.dev/0db96cc2-e09f-41a8-8ae0-5feb90ee2364",
-      "dataAiHint": "user uploaded"
+      "src": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3ZkZTVqY291d3M2aTNicHFsc2NuZ3JoZTVoYzF3cGQ3eWZpdmFpMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Lwpr3hN133L3y/giphy.gif",
+      "dataAiHint": "user uploaded",
+      "showFooter": true,
+      "footerText1": "URGENTE",
+      "footerText2": "ESTA É UMA NOTÍCIA",
+      "footerBgColor": "#b91c1c"
     },
     {
-      "id": "1753729666492",
-      "name": "xineray",
+      "id": "1753729978356",
+      "name": "Vídeo YouTube",
       "date": "2025-07-28",
       "type": "Iframe",
-      "src": "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/4WrR52FI498?si=TCbScbYXgz8hOyt4&amp;start=157\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>"
-    },
-    {
-      "id": "1753729766629",
-      "name": "02 t",
-      "date": "2025-07-28",
-      "type": "Iframe",
-      "src": "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/4WrR52FI498?si=TCbScbYXgz8hOyt4&amp;start=157\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>"
+      "src": "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/4WrR52FI498?si=TCbScbYXgz8hOyt4&amp;start=157\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>",
+      "showFooter": false,
+      "footerText1": "",
+      "footerText2": "",
+      "footerBgColor": "#dc2626"
     }
   ],
   "playlists": [
     {
       "id": "1",
-      "name": "Lobby Playlist",
+      "name": "Lobby Principal",
       "items": [
         {
-          "mediaId": "1753729515101",
-          "duration": 4
+          "mediaId": "1753729970729",
+          "duration": 12
         },
         {
-          "mediaId": "1753729666492",
-          "duration": 10
+          "mediaId": "3",
+          "duration": 8
         },
         {
-          "mediaId": "1753729766629",
-          "duration": 10
+          "mediaId": "1753729978356",
+          "duration": 15
         }
       ]
     },
     {
+      "id": "2",
+      "name": "Rodeio",
+      "items": []
+    },
+    {
       "id": "3",
-      "name": "xineray",
-      "items": [
-        {
-          "mediaId": "3",
-          "duration": 10
-        },
-        {
-          "mediaId": "4",
-          "duration": 10
-        }
-      ]
+      "name": "Xineray",
+      "items": []
     }
   ]
 }
