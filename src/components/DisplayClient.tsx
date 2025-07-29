@@ -168,7 +168,15 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
           <CarouselItem key={`${item.id}-${index}`} className="relative">
             <Card className="h-screen w-screen border-0 rounded-none bg-black flex items-center justify-center">
               <CardContent className="flex items-center justify-center p-0 w-full h-full">
-                {item.type.startsWith('image/') && (
+                {item.type.startsWith('image/') && item.type.includes('gif') && (
+                    <img
+                      src={item.src!}
+                      alt={item.name}
+                      className="object-contain w-full h-full"
+                      data-ai-hint={item.dataAiHint}
+                    />
+                )}
+                {item.type.startsWith('image/') && !item.type.includes('gif') &&(
                     <Image
                       src={item.src!}
                       alt={item.name}
@@ -176,7 +184,6 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                       height={1080}
                       className="object-contain w-full h-full"
                       data-ai-hint={item.dataAiHint}
-                      unoptimized={item.type === 'image/gif'}
                     />
                 )}
                 {item.type.startsWith('video/') && (
@@ -222,16 +229,16 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                 className="absolute bottom-0 left-0 right-0" 
               >
                 <div
-                  className="relative p-4 text-white"
+                  className="relative p-4 text-white flex items-center"
                   style={{ backgroundColor: item.footerBgColor || 'rgba(220, 38, 38, 0.9)' }}
                 >
                    <div 
-                    className="absolute left-[15%] -top-3 font-bold uppercase inline-block px-4 py-2 text-base rounded"
+                    className="absolute left-[15%] -top-4 font-bold uppercase inline-block px-4 py-1 text-base rounded"
                     style={{ backgroundColor: item.footerBgColor || '#b91c1c', color: 'white' }}
                    >
                      {item.footerText1}
                    </div>
-                   <h2 className="text-4xl lg:text-6xl font-extrabold uppercase tracking-tighter">
+                   <h2 className="text-4xl lg:text-6xl font-extrabold uppercase tracking-tighter w-full text-center">
                      {item.footerText2}
                    </h2>
                 </div>
