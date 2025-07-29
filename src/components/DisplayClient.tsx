@@ -217,15 +217,22 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
             </Card>
             {item.showFooter && (
               <div 
-                className="absolute bottom-0 left-0 right-0 p-4 text-white" 
-                style={{ backgroundColor: item.footerBgColor || 'rgba(220, 38, 38, 0.9)' }}
+                className="absolute bottom-0 left-0 right-0" 
               >
-                <div className="bg-white text-black font-bold uppercase inline-block px-3 py-1 text-sm mb-2 rounded">
-                  {item.footerText1}
+                <div
+                  className="relative p-4 text-white"
+                  style={{ backgroundColor: item.footerBgColor || 'rgba(220, 38, 38, 0.9)' }}
+                >
+                   <div 
+                    className="absolute left-[15%] -top-4 bg-white text-black font-bold uppercase inline-block px-3 py-1 text-sm rounded"
+                    style={{ backgroundColor: 'white', color: item.footerBgColor || 'black' }}
+                   >
+                     {item.footerText1}
+                   </div>
+                   <h2 className="text-4xl lg:text-6xl font-extrabold uppercase tracking-tighter">
+                     {item.footerText2}
+                   </h2>
                 </div>
-                <h2 className="text-4xl lg:text-6xl font-extrabold uppercase tracking-tighter">
-                  {item.footerText2}
-                </h2>
               </div>
             )}
           </CarouselItem>
