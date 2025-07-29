@@ -224,8 +224,8 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                   style={{ backgroundColor: item.footerBgColor || 'rgba(220, 38, 38, 0.9)' }}
                 >
                    <div 
-                    className="absolute left-[15%] -top-4 bg-white text-black font-bold uppercase inline-block px-3 py-1 text-sm rounded"
-                    style={{ backgroundColor: 'white', color: item.footerBgColor || 'black' }}
+                    className="absolute left-[15%] -top-4 font-bold uppercase inline-block px-3 py-1 text-sm rounded"
+                    style={{ backgroundColor: item.footerBgColor || 'black', color: 'white' }}
                    >
                      {item.footerText1}
                    </div>
