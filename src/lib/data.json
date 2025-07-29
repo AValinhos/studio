@@ -75,6 +75,15 @@
       "footerText1": "",
       "footerText2": "",
       "footerBgColor": "#dc2626"
+    },
+    {
+      "id": "1753820733211",
+      "name": "texto 01",
+      "date": "2025-07-29",
+      "type": "Text",
+      "content": "informação do dia ",
+      "subContent": "Gerado pelo Uploader de Conteúdo",
+      "bgColor": "#75228c"
     }
   ],
   "playlists": [
@@ -93,6 +102,10 @@
         {
           "mediaId": "1753729978356",
           "duration": 15
+        },
+        {
+          "mediaId": "1753820733211",
+          "duration": 8
         }
       ]
     },

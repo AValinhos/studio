@@ -23,6 +23,7 @@ export default function ContentUploader({ onContentSaved }: ContentUploaderProps
   const [file, setFile] = useState<File | null>(null);
   const [iframeUrl, setIframeUrl] = useState('');
   const [textContent, setTextContent] = useState('');
+  const [textSubContent, setTextSubContent] = useState('');
   const [textBgColor, setTextBgColor] = useState('#228B22');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -32,6 +33,7 @@ export default function ContentUploader({ onContentSaved }: ContentUploaderProps
     setFile(null);
     setIframeUrl('');
     setTextContent('');
+    setTextSubContent('');
     setTextBgColor('#228B22');
     const fileInput = document.getElementById('media-file') as HTMLInputElement;
     if (fileInput) {
@@ -87,7 +89,7 @@ export default function ContentUploader({ onContentSaved }: ContentUploaderProps
           }
           newMediaItem.type = 'Text';
           newMediaItem.content = textContent;
-          newMediaItem.subContent = "Gerado pelo Uploader de Conteúdo";
+          newMediaItem.subContent = textSubContent;
           newMediaItem.bgColor = textBgColor;
           break;
       }
@@ -175,9 +177,19 @@ export default function ContentUploader({ onContentSaved }: ContentUploaderProps
                   <Label htmlFor="text-content">Conteúdo do Texto</Label>
                   <Textarea 
                     id="text-content" 
-                    placeholder="Digite seu anúncio ou mensagem aqui." 
+                    placeholder="Digite seu anúncio ou mensagem principal aqui." 
                     value={textContent}
                     onChange={(e) => setTextContent(e.target.value)}
+                  />
+                </div>
+                 <div className="grid gap-2">
+                  <Label htmlFor="text-subcontent">Subconteúdo</Label>
+                  <Textarea 
+                    id="text-subcontent" 
+                    placeholder="Digite o texto secundário (opcional)." 
+                    value={textSubContent}
+                    onChange={(e) => setTextSubContent(e.target.value)}
+                    rows={2}
                   />
                 </div>
                  <div className="grid gap-2">
@@ -187,7 +199,7 @@ export default function ContentUploader({ onContentSaved }: ContentUploaderProps
                       type="color" 
                       value={textBgColor} 
                       onChange={(e) => setTextBgColor(e.target.value)} 
-                      className="p-1 h-10"
+                      className="p-1 h-8 w-24"
                     />
                 </div>
               </div>
