@@ -66,6 +66,7 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
   const [editedSrc, setEditedSrc] = useState('');
   const [editedContent, setEditedContent] = useState('');
   const [editedSubContent, setEditedSubContent] = useState('');
+  const [editedBgColor, setEditedBgColor] = useState('#228B22');
   const [showFooter, setShowFooter] = useState(false);
   const [footerText1, setFooterText1] = useState('');
   const [footerText2, setFooterText2] = useState('');
@@ -136,6 +137,7 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
     setEditedSrc(item.src || '');
     setEditedContent(item.content || '');
     setEditedSubContent(item.subContent || '');
+    setEditedBgColor(item.bgColor || '#228B22');
     setShowFooter(item.showFooter || false);
     setFooterText1(item.footerText1 || '');
     setFooterText2(item.footerText2 || '');
@@ -155,6 +157,7 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
         src: editedSrc,
         content: editedContent,
         subContent: editedSubContent,
+        bgColor: editedBgColor,
         showFooter: showFooter,
         footerText1: footerText1,
         footerText2: footerText2,
@@ -386,6 +389,10 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
                      <div className="grid grid-cols-4 items-start gap-4">
                         <Label htmlFor="subcontent" className="text-right pt-2">Subconteúdo</Label>
                         <Textarea id="subcontent" value={editedSubContent} onChange={(e) => setEditedSubContent(e.target.value)} className="col-span-3" />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="text-bgcolor-edit" className="text-right">Cor Fundo</Label>
+                        <Input id="text-bgcolor-edit" type="color" value={editedBgColor} onChange={(e) => setEditedBgColor(e.target.value)} className="col-span-3 p-1 h-10"/>
                     </div>
                   </>
                 ) : (

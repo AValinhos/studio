@@ -23,6 +23,7 @@ export default function ContentUploader({ onContentSaved }: ContentUploaderProps
   const [file, setFile] = useState<File | null>(null);
   const [iframeUrl, setIframeUrl] = useState('');
   const [textContent, setTextContent] = useState('');
+  const [textBgColor, setTextBgColor] = useState('#228B22');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -31,6 +32,7 @@ export default function ContentUploader({ onContentSaved }: ContentUploaderProps
     setFile(null);
     setIframeUrl('');
     setTextContent('');
+    setTextBgColor('#228B22');
     const fileInput = document.getElementById('media-file') as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
@@ -64,9 +66,7 @@ export default function ContentUploader({ onContentSaved }: ContentUploaderProps
             setIsLoading(false);
             return;
           }
-          newMediaItem.type = file.type; // Save the full MIME type
-          // NOTE: This creates a temporary blob URL. For a real app, you'd upload to a service
-          // and get a persistent URL. This approach will not work across browser sessions.
+          newMediaItem.type = file.type;
           newMediaItem.src = URL.createObjectURL(file); 
           newMediaItem.dataAiHint = "user uploaded";
           break;
@@ -88,6 +88,7 @@ export default function ContentUploader({ onContentSaved }: ContentUploaderProps
           newMediaItem.type = 'Text';
           newMediaItem.content = textContent;
           newMediaItem.subContent = "Gerado pelo Uploader de Conteúdo";
+          newMediaItem.bgColor = textBgColor;
           break;
       }
       
@@ -169,14 +170,26 @@ export default function ContentUploader({ onContentSaved }: ContentUploaderProps
               </div>
             </TabsContent>
             <TabsContent value="text">
-              <div className="grid gap-2">
-                <Label htmlFor="text-content">Conteúdo do Texto</Label>
-                <Textarea 
-                  id="text-content" 
-                  placeholder="Digite seu anúncio ou mensagem aqui." 
-                  value={textContent}
-                  onChange={(e) => setTextContent(e.target.value)}
-                />
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="text-content">Conteúdo do Texto</Label>
+                  <Textarea 
+                    id="text-content" 
+                    placeholder="Digite seu anúncio ou mensagem aqui." 
+                    value={textContent}
+                    onChange={(e) => setTextContent(e.target.value)}
+                  />
+                </div>
+                 <div className="grid gap-2">
+                    <Label htmlFor="text-bgcolor">Cor de Fundo</Label>
+                    <Input 
+                      id="text-bgcolor" 
+                      type="color" 
+                      value={textBgColor} 
+                      onChange={(e) => setTextBgColor(e.target.value)} 
+                      className="p-1 h-10"
+                    />
+                </div>
               </div>
             </TabsContent>
           </div>

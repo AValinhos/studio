@@ -17,6 +17,7 @@ export interface MediaItem {
   src?: string;
   content?: string;
   subContent?: string;
+  bgColor?: string;
   dataAiHint?: string;
   date: string;
   showFooter?: boolean;

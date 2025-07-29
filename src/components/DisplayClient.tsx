@@ -19,6 +19,7 @@ interface MediaItem {
   src?: string;
   content?: string;
   subContent?: string;
+  bgColor?: string;
   dataAiHint?: string;
   date: string;
   showFooter?: boolean;
@@ -204,7 +205,13 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                   />
                 )}
                 {item.type === 'Text' && (
-                   <div className="flex flex-col items-center justify-center text-center p-8 bg-gradient-to-br from-primary to-green-800 w-full h-full">
+                   <div 
+                     className="flex flex-col items-center justify-center text-center p-8 w-full h-full"
+                     style={{ 
+                       backgroundColor: item.bgColor,
+                       backgroundImage: !item.bgColor ? 'linear-gradient(to bottom right, hsl(var(--primary)), #228B22)' : 'none'
+                     }}
+                   >
                      <h1 className="text-7xl font-bold text-primary-foreground drop-shadow-lg">
                        {item.content}
                      </h1>
@@ -225,7 +232,7 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                 >
                    <div 
                     className="absolute left-[15%] -top-4 font-bold uppercase inline-block px-3 py-1 text-sm rounded"
-                    style={{ backgroundColor: item.footerBgColor || 'black', color: 'white' }}
+                    style={{ backgroundColor: item.footerBgColor || '#b91c1c', color: 'white' }}
                    >
                      {item.footerText1}
                    </div>
