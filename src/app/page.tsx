@@ -75,11 +75,9 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: AnalyticsDataPoint[] | null, playlistNames: string[] | null }) => {
   
   useEffect(() => {
-    
     const drawChart = () => {
       // @ts-ignore
-      if (!window.google || !window.google.visualization) return;
-      if (!analyticsData || !playlistNames) return;
+      if (!window.google || !window.google.visualization || !analyticsData || !playlistNames) return;
 
       // @ts-ignore
       const data = new window.google.visualization.DataTable();
@@ -131,25 +129,15 @@ const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: Anal
       }
     };
     
-     // @ts-ignore
-    if (typeof window.google === 'undefined' || !window.google.charts) {
-      return;
+    // @ts-ignore
+    if (typeof window.google !== 'undefined' && typeof window.google.charts !== 'undefined') {
+        // @ts-ignore
+        google.charts.load('current', { 'packages': ['line'] });
+        // @ts-ignore
+        google.charts.setOnLoadCallback(drawChart);
     }
-    // @ts-ignore
-    google.charts.load('current', { 'packages': ['line'] });
-    // @ts-ignore
-    google.charts.setOnLoadCallback(drawChart);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [analyticsData, playlistNames]);
-
-  if (!analyticsData || !playlistNames || analyticsData.length === 0 || playlistNames.length === 0) {
-    return (
-      <div className="flex justify-center items-center h-[300px]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
 
   return <div id="line_chart" style={{ width: '100%', minHeight: '300px' }}></div>;
 };
@@ -239,7 +227,7 @@ export default function Dashboard() {
     };
   }, [playlists, mediaItems, isLoading]);
   
-   const playlistNames = useMemo(() => playlists.length > 0 ? playlists.map(p => p.name) : null, [playlists]);
+   const playlistNames = useMemo(() => playlists.length > 0 ? playlists.map(p => p.name) : [], [playlists]);
 
   return (
     <AuthGuard>
@@ -308,7 +296,13 @@ export default function Dashboard() {
                     <CardDescription>Duração total (em minutos) de cada playlist ao longo dos dias.</CardDescription>
                   </CardHeader>
                   <CardContent>
+                    {isLoading || !analyticsData || playlistNames.length === 0 ? (
+                      <div className="flex justify-center items-center h-[300px]">
+                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                      </div>
+                    ) : (
                      <GoogleLineChart analyticsData={analyticsData} playlistNames={playlistNames} />
+                    )}
                   </CardContent>
                 </Card>
             </div>
@@ -318,4 +312,3 @@ export default function Dashboard() {
     </AuthGuard>
   );
 }
-
