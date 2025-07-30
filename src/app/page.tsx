@@ -9,8 +9,10 @@ import MediaManager from '@/components/MediaManager';
 import PlaylistManager from '@/components/PlaylistManager';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { BarChart, Tv, Clapperboard, ListMusic, Loader2 } from 'lucide-react';
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 
 export interface MediaItem {
@@ -47,17 +49,59 @@ export interface AnalyticsDataPoint {
 }
 
 
-function AnalyticsChart({ analyticsData, playlistNames, chartConfig }: { analyticsData: AnalyticsDataPoint[] | null, playlistNames: string[], chartConfig: any }) {
-  const [hiddenPlaylists, setHiddenPlaylists] = useState<string[]>([]);
+function AnalyticsChart({ analyticsData, playlists }: { analyticsData: AnalyticsDataPoint[] | null, playlists: Playlist[] }) {
+  const chartData = useMemo(() => {
+    if (!analyticsData || !playlists || analyticsData.length === 0 || playlists.length === 0) {
+      return { labels: [], datasets: [] };
+    }
 
-  const togglePlaylistVisibility = (dataKey: string) => {
-    setHiddenPlaylists(prev => 
-      prev.includes(dataKey) 
-        ? prev.filter(name => name !== dataKey) 
-        : [...prev, dataKey]
-    );
+    const labels = analyticsData.map(d => new Date(d.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
+    
+    const colors = [
+      'rgb(75, 192, 192)',
+      'rgb(255, 99, 132)',
+      'rgb(54, 162, 235)',
+      'rgb(255, 205, 86)',
+      'rgb(153, 102, 255)',
+    ];
+    
+    const datasets = playlists.map((playlist, index) => {
+      return {
+        label: playlist.name,
+        data: analyticsData.map(day => day[playlist.name] || 0),
+        borderColor: colors[index % colors.length],
+        backgroundColor: colors[index % colors.length].replace(')', ', 0.2)').replace('rgb', 'rgba'),
+        fill: true,
+        tension: 0.3,
+      };
+    });
+
+    return { labels, datasets };
+
+  }, [analyticsData, playlists]);
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: false,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: function(value: any) {
+            return `${value} min`
+          }
+        }
+      }
+    }
   };
-  
+
   if (!analyticsData || analyticsData.length === 0) {
     return (
       <div className="flex h-80 w-full items-center justify-center text-muted-foreground">
@@ -66,54 +110,7 @@ function AnalyticsChart({ analyticsData, playlistNames, chartConfig }: { analyti
     );
   }
 
-  const chartData = analyticsData.map(d => ({
-    ...d,
-    date: new Date(d.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
-  }));
-
-
-  return (
-     <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
-      <AreaChart data={chartData}>
-        <defs>
-          {Object.keys(chartConfig).map((key, index) => (
-            <linearGradient key={key} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={`hsl(var(--chart-${index+1}))`} stopOpacity={0.8} />
-              <stop offset="95%" stopColor={`hsl(var(--chart-${index+1}))`} stopOpacity={0.1} />
-            </linearGradient>
-          ))}
-        </defs>
-        <CartesianGrid vertical={false} />
-        <XAxis
-          dataKey="date"
-          tickLine={false}
-          axisLine={false}
-          tickMargin={8}
-          tickFormatter={(value) => value}
-        />
-        <YAxis
-          tickLine={false}
-          axisLine={false}
-          tickMargin={8}
-          tickFormatter={(value) => `${value} min`}
-        />
-        <Tooltip content={<ChartTooltipContent indicator="dot" />} />
-        <Legend content={<ChartLegendContent onClick={(payload) => togglePlaylistVisibility(payload.dataKey as string)} />} />
-        {playlistNames.map((name, index) => (
-          !hiddenPlaylists.includes(name) && (
-            <Area
-              key={name}
-              dataKey={name}
-              type="natural"
-              fill={`url(#fill-${name})`}
-              stroke={`hsl(var(--chart-${index+1}))`}
-              stackId="1"
-            />
-          )
-        ))}
-      </AreaChart>
-    </ChartContainer>
-  );
+  return <Line options={options} data={chartData} />;
 }
 
 
@@ -163,7 +160,6 @@ export default function Dashboard() {
       const analyticsRes = await fetch('/api/analytics');
       if(analyticsRes.ok) {
         const analytics = await analyticsRes.json();
-        // Sort data chronologically
         analytics.sort((a: AnalyticsDataPoint, b: AnalyticsDataPoint) => new Date(a.date).getTime() - new Date(b.date).getTime());
         setAnalyticsData(analytics);
       }
@@ -189,7 +185,7 @@ export default function Dashboard() {
             .then(res => {
                 if (res.ok) {
                     localStorage.setItem('lastAnalyticsUpdate', today);
-                    fetchData(); // Refresh all data after posting
+                    fetchData(); 
                 }
             })
             .catch(err => console.error("Falha ao atualizar analytics:", err));
@@ -229,19 +225,6 @@ export default function Dashboard() {
       mostViewedItemName: mostViewedItem ? mostViewedItem.name : "Nenhum",
     };
   }, [playlists, mediaItems, isLoading]);
-  
-   const playlistNames = useMemo(() => playlists.length > 0 ? playlists.map(p => p.name) : [], [playlists]);
-
-   const chartConfig = useMemo(() => {
-    const config: { [key: string]: { label: string, color: string } } = {};
-    playlistNames.forEach((name, index) => {
-      config[name] = {
-        label: name,
-        color: `hsl(var(--chart-${index + 1}))`,
-      };
-    });
-    return config;
-  }, [playlistNames]);
 
   return (
     <AuthGuard>
@@ -305,8 +288,7 @@ export default function Dashboard() {
                 ) : (
                   <AnalyticsChart 
                     analyticsData={analyticsData} 
-                    playlistNames={playlistNames}
-                    chartConfig={chartConfig}
+                    playlists={playlists}
                   />
                 )}
               </CardContent>
