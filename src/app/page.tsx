@@ -73,68 +73,74 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
 
 const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: AnalyticsDataPoint[], playlistNames: string[] }) => {
-  const drawChart = () => {
-    if (typeof window.google === 'undefined' || typeof window.google.visualization === 'undefined') {
-        // Se a biblioteca não estiver pronta, aguarde.
-        return;
+  
+  useEffect(() => {
+    if (!analyticsData || analyticsData.length === 0 || !playlistNames || playlistNames.length === 0) {
+        return; // Não renderize se não houver dados
     }
-
-    const data = new window.google.visualization.DataTable();
-    data.addColumn('string', 'Dia');
-    playlistNames.forEach(name => {
-      data.addColumn('number', name);
-    });
-
-    const rows = analyticsData.map(point => {
-      const date = new Date(point.date);
-      date.setUTCHours(0, 0, 0, 0);
-      const formattedDate = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' });
-      const row: (string | number)[] = [formattedDate];
+    
+    const drawChart = () => {
+      // @ts-ignore
+      if (typeof window.google === 'undefined' || typeof window.google.visualization === 'undefined') {
+          return;
+      }
+      // @ts-ignore
+      const data = new window.google.visualization.DataTable();
+      data.addColumn('string', 'Dia');
       playlistNames.forEach(name => {
-        row.push(point[name] || 0);
+        data.addColumn('number', name);
       });
-      return row;
-    });
 
-    data.addRows(rows);
+      const rows = analyticsData.map(point => {
+        const date = new Date(point.date);
+        date.setUTCHours(0, 0, 0, 0);
+        const formattedDate = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' });
+        const row: (string | number)[] = [formattedDate];
+        playlistNames.forEach(name => {
+          row.push(point[name] || 0);
+        });
+        return row;
+      });
 
-    const options = {
-      chart: {
-        title: 'Evolução da Duração por Playlist',
-        subtitle: 'em minutos'
-      },
-      height: 300,
-      colors: ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'],
-      backgroundColor: 'transparent',
-      titleTextStyle: {
-         color: 'hsl(var(--foreground))'
-      },
-      subtitleTextStyle: {
-         color: 'hsl(var(--muted-foreground))'
-      },
-      legendTextStyle: {
-        color: 'hsl(var(--foreground))'
-      },
-      hAxis: {
-        textStyle: {color: 'hsl(var(--muted-foreground))'}
-      },
-      vAxis: {
-        textStyle: {color: 'hsl(var(--muted-foreground))'}
+      data.addRows(rows);
+
+      const options = {
+        height: 300,
+        colors: ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'],
+        backgroundColor: 'transparent',
+        titleTextStyle: {
+           color: 'hsl(var(--foreground))'
+        },
+        subtitleTextStyle: {
+           color: 'hsl(var(--muted-foreground))'
+        },
+        legendTextStyle: {
+          color: 'hsl(var(--foreground))'
+        },
+        hAxis: {
+          textStyle: {color: 'hsl(var(--muted-foreground))'}
+        },
+        vAxis: {
+          textStyle: {color: 'hsl(var(--muted-foreground))'}
+        }
+      };
+      
+      const chartElement = document.getElementById('line_chart');
+      if (chartElement) {
+        // @ts-ignore
+        const chart = new window.google.charts.Line(chartElement);
+        // @ts-ignore
+        chart.draw(data, window.google.charts.Line.convertOptions(options));
       }
     };
     
-    const chartElement = document.getElementById('line_chart');
-    if (chartElement) {
-      const chart = new window.google.charts.Line(chartElement);
-      chart.draw(data, window.google.charts.Line.convertOptions(options));
-    }
-  };
-  
-  useEffect(() => {
+    // @ts-ignore
     if (typeof window.google === 'undefined') {
       return;
     }
+    // @ts-ignore
     google.charts.load('current', { 'packages': ['line'] });
+    // @ts-ignore
     google.charts.setOnLoadCallback(drawChart);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
