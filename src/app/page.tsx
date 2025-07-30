@@ -50,9 +50,11 @@ export interface AnalyticsDataPoint {
 function AnalyticsChart({ analyticsData, playlistNames, chartConfig }: { analyticsData: AnalyticsDataPoint[] | null, playlistNames: string[], chartConfig: any }) {
   const [hiddenPlaylists, setHiddenPlaylists] = useState<string[]>([]);
 
-  const handleLegendItemClick = (dataKey: string) => {
+  const togglePlaylistVisibility = (dataKey: string) => {
     setHiddenPlaylists(prev => 
-      prev.includes(dataKey) ? prev.filter(name => name !== dataKey) : [...prev, dataKey]
+      prev.includes(dataKey) 
+        ? prev.filter(name => name !== dataKey) 
+        : [...prev, dataKey]
     );
   };
   
@@ -96,7 +98,7 @@ function AnalyticsChart({ analyticsData, playlistNames, chartConfig }: { analyti
           tickFormatter={(value) => `${value} min`}
         />
         <Tooltip content={<ChartTooltipContent indicator="dot" />} />
-        <Legend content={<ChartLegendContent onClick={(payload) => handleLegendItemClick(payload.dataKey as string)} />} />
+        <Legend content={<ChartLegendContent onClick={(payload) => togglePlaylistVisibility(payload.dataKey as string)} />} />
         {playlistNames.map((name, index) => (
           !hiddenPlaylists.includes(name) && (
             <Area
