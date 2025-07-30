@@ -84,8 +84,20 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
-    const color = itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null
+    const color = itemConfig.color
+    const themeColors =
+      typeof itemConfig.theme === "object"
+        ? Object.entries(itemConfig.theme)
+            .map(
+              ([theme, color]) =>
+                `${THEMES[theme as keyof typeof THEMES]} { --color-${key}: ${color}; }`
+            )
+            .join("\n")
+        : undefined
+
+    return color || themeColors
+      ? `  --color-${key}: ${color};\n${themeColors || ""}`
+      : ""
   })
   .join("\n")}
 }

@@ -10,8 +10,8 @@ import MediaManager from '@/components/MediaManager';
 import PlaylistManager from '@/components/PlaylistManager';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { BarChart, Tv, Clapperboard, ListMusic, Loader2 } from 'lucide-react';
-import { Line, XAxis, YAxis, CartesianGrid, Legend, LineChart } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, Chart as ShadcnChart, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
+import { Line, XAxis, YAxis, CartesianGrid, LineChart as RechartsLineChart } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import type { ChartConfig } from '@/components/ui/chart';
 
 export interface MediaItem {
@@ -156,12 +156,13 @@ export default function Dashboard() {
   }, [playlists, mediaItems, isLoading]);
   
    const playlistNames = useMemo(() => playlists.map(p => p.name), [playlists]);
-   const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00C49F', '#FFBB28'];
+   const colors = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 
    const chartConfig = useMemo(() => {
     const config: ChartConfig = {};
     playlistNames.forEach((name, index) => {
-        config[name] = {
+        const sanitizedName = name.replace(/\s+/g, '-');
+        config[sanitizedName] = {
             label: name,
             color: colors[index % colors.length],
         };
@@ -242,7 +243,7 @@ export default function Dashboard() {
                         </div>
                      ) : (
                         <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
-                            <LineChart data={analyticsData} accessibilityLayer>
+                            <RechartsLineChart data={analyticsData} accessibilityLayer>
                                 <CartesianGrid vertical={false} />
                                 <XAxis
                                     dataKey="date"
@@ -254,17 +255,17 @@ export default function Dashboard() {
                                 <YAxis />
                                 <ChartTooltip content={<ChartTooltipContent />} />
                                  <ChartLegend content={<ChartLegendContent />} />
-                                 {playlistNames.map((name) => (
+                                 {Object.keys(chartConfig).map((key) => (
                                     <Line 
-                                        key={name}
+                                        key={key}
                                         type="monotone" 
-                                        dataKey={name} 
-                                        stroke={`var(--color-${name})`}
+                                        dataKey={key.replace(/-/g, ' ')} 
+                                        stroke={chartConfig[key].color}
                                         strokeWidth={2} 
                                         dot={false} 
                                     />
                                 ))}
-                            </LineChart>
+                            </RechartsLineChart>
                         </ChartContainer>
                      )}
                   </CardContent>
