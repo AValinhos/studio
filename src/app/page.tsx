@@ -12,7 +12,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/com
 import { BarChart, Tv, Clapperboard, ListMusic, Loader2 } from 'lucide-react';
 import { Line, XAxis, YAxis, CartesianGrid, LineChart as RechartsLineChart } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
-import type { ChartConfig } from '@/components/ui/chart';
+import type { ChartConfig, ChartProps } from '@/components/ui/chart';
 
 export interface MediaItem {
   id: string;
@@ -81,7 +81,6 @@ export default function Dashboard() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [analyticsData, setAnalyticsData] = useState<AnalyticsDataPoint[]>([]);
-  const [hiddenPlaylists, setHiddenPlaylists] = useState<string[]>([]);
 
   const fetchData = async () => {
     try {
@@ -107,7 +106,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchData();
-    
+  }, []);
+
+  useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
     const lastUpdate = localStorage.getItem('lastAnalyticsUpdate');
 
@@ -121,7 +122,6 @@ export default function Dashboard() {
             })
             .catch(err => console.error("Falha ao atualizar analytics:", err));
     }
-
   }, []);
 
   const { totalExposureMinutes, mostViewedItemName } = useMemo(() => {
@@ -259,30 +259,17 @@ export default function Dashboard() {
                                 />
                                 <YAxis />
                                 <ChartTooltip content={<ChartTooltipContent />} />
-                                 <ChartLegend
-                                    content={<ChartLegendContent 
-                                        onClick={(item) => {
-                                            const key = item.dataKey as string;
-                                            setHiddenPlaylists(prev => 
-                                                prev.includes(key)
-                                                ? prev.filter(k => k !== key)
-                                                : [...prev, key]
-                                            )
-                                        }}
-                                    />} 
-                                 />
+                                 <ChartLegend content={<ChartLegendContent />} />
                                  {Object.keys(chartConfig).map((key) => (
-                                    !hiddenPlaylists.includes(key) && (
-                                        <Line 
-                                            key={key}
-                                            type="monotone" 
-                                            dataKey={key}
-                                            stroke={chartConfig[key].color}
-                                            strokeWidth={2} 
-                                            dot={false}
-                                            name={chartConfig[key].label as string}
-                                        />
-                                    )
+                                    <Line 
+                                        key={key}
+                                        type="monotone" 
+                                        dataKey={key}
+                                        stroke={chartConfig[key].color}
+                                        strokeWidth={2} 
+                                        dot={false}
+                                        name={chartConfig[key].label as string}
+                                    />
                                 ))}
                             </RechartsLineChart>
                         </ChartContainer>
