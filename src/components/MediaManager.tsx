@@ -71,6 +71,8 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
   const [footerText1, setFooterText1] = useState('');
   const [footerText2, setFooterText2] = useState('');
   const [footerBgColor, setFooterBgColor] = useState('#dc2626');
+  const [footerImageSrc, setFooterImageSrc] = useState('');
+
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [filterType, setFilterType] = useState('all');
@@ -142,6 +144,7 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
     setFooterText1(item.footerText1 || '');
     setFooterText2(item.footerText2 || '');
     setFooterBgColor(item.footerBgColor || '#dc2626');
+    setFooterImageSrc(item.footerImageSrc || '');
     setIsEditDialogOpen(true);
   };
 
@@ -162,6 +165,7 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
         footerText1: footerText1,
         footerText2: footerText2,
         footerBgColor: footerBgColor,
+        footerImageSrc: footerImageSrc,
     };
 
     try {
@@ -426,6 +430,10 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="footer-bgcolor" className="text-right">Cor de Fundo</Label>
                                 <Input id="footer-bgcolor" type="color" value={footerBgColor} onChange={(e) => setFooterBgColor(e.target.value)} className="col-span-3 p-1 h-10"/>
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="footer-image" className="text-right">URL da Imagem</Label>
+                                <Input id="footer-image" value={footerImageSrc} onChange={(e) => setFooterImageSrc(e.target.value)} className="col-span-3" placeholder="https://example.com/logo.png"/>
                             </div>
                         </div>
                     )}

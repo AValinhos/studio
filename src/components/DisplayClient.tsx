@@ -26,6 +26,7 @@ interface MediaItem {
   footerText1?: string;
   footerText2?: string;
   footerBgColor?: string;
+  footerImageSrc?: string;
 }
 
 interface PlaylistItemData {
@@ -258,12 +259,21 @@ export default function DisplayClient({ playlistId }: { playlistId: string }) {
                     </span>
                 </div>
                 <div 
-                    className="absolute bottom-0 left-0 right-0 p-4 h-24 flex items-center" 
+                    className="absolute bottom-0 left-0 right-0 p-4 h-24 flex items-center justify-between" 
                     style={{ backgroundColor: item.footerBgColor || 'rgba(0, 0, 0, 0.8)' }}
                 >
                     <h2 className="text-4xl lg:text-6xl font-extrabold uppercase tracking-tighter text-white ml-[5%]">
                         {item.footerText2}
                     </h2>
+                     {item.footerImageSrc && (
+                        <Image
+                            src={item.footerImageSrc}
+                            alt="Footer Image"
+                            width={80}
+                            height={80}
+                            className="object-contain h-20 w-20 mr-[5%]"
+                        />
+                    )}
                 </div>
               </div>
             )}

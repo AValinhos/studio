@@ -24,6 +24,7 @@ export interface MediaItem {
   footerText1?: string;
   footerText2?: string;
   footerBgColor?: string;
+  footerImageSrc?: string;
 }
 
 export interface PlaylistItemData {

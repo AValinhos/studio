@@ -15,7 +15,8 @@
       "showFooter": false,
       "footerText1": "",
       "footerText2": "",
-      "footerBgColor": "#dc2626"
+      "footerBgColor": "#dc2626",
+      "footerImageSrc": ""
     },
     {
       "id": "3",
@@ -27,7 +28,8 @@
       "showFooter": true,
       "footerText1": "ANIVERSÁRIO",
       "footerText2": "10 ANOS DE SUCESSO",
-      "footerBgColor": "rgba(34, 139, 34, 0.9)"
+      "footerBgColor": "rgba(34, 139, 34, 0.9)",
+      "footerImageSrc": "https://placehold.co/100x100.png"
     },
     {
       "id": "4",
@@ -39,7 +41,8 @@
       "showFooter": false,
       "footerText1": "",
       "footerText2": "",
-      "footerBgColor": "#dc2626"
+      "footerBgColor": "#dc2626",
+      "footerImageSrc": ""
     },
     {
       "id": "5",
@@ -51,7 +54,8 @@
       "showFooter": false,
       "footerText1": "",
       "footerText2": "",
-      "footerBgColor": "#dc2626"
+      "footerBgColor": "#dc2626",
+      "footerImageSrc": ""
     },
     {
       "id": "1753729970729",
@@ -63,7 +67,8 @@
       "showFooter": true,
       "footerText1": "URGENTE",
       "footerText2": "ESTA É UMA NOTÍCIA",
-      "footerBgColor": "#b91c1c"
+      "footerBgColor": "#b91c1c",
+      "footerImageSrc": ""
     },
     {
       "id": "1753729978356",
@@ -77,7 +82,8 @@
       "footerBgColor": "#2c61dd",
       "content": "",
       "subContent": "",
-      "bgColor": "#228B22"
+      "bgColor": "#228B22",
+      "footerImageSrc": ""
     },
     {
       "id": "1753820733211",
@@ -91,7 +97,8 @@
       "showFooter": true,
       "footerText1": "noticia",
       "footerText2": "Noticia da carvalheira urgente",
-      "footerBgColor": "#53dd2c"
+      "footerBgColor": "#53dd2c",
+      "footerImageSrc": ""
     },
     {
       "id": "1753821883026",
@@ -105,7 +112,8 @@
       "showFooter": true,
       "footerText1": "noticia",
       "footerText2": "rodeio",
-      "footerBgColor": "#2c41dd"
+      "footerBgColor": "#2c41dd",
+      "footerImageSrc": ""
     }
   ],
   "playlists": [
