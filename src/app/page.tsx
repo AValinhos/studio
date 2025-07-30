@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -73,12 +74,11 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
 const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: AnalyticsDataPoint[], playlistNames: string[] }) => {
   useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).google && (window as any).google.charts) {
-      (window as any).google.charts.load('current', { packages: ['line'] });
-      (window as any).google.charts.setOnLoadCallback(drawChart);
-    }
-
-    function drawChart() {
+    const drawChart = () => {
+      if (typeof window === 'undefined' || !(window as any).google || !(window as any).google.visualization) {
+        return;
+      }
+      
       const data = new (window as any).google.visualization.DataTable();
       data.addColumn('string', 'Dia');
       playlistNames.forEach(name => {
@@ -91,7 +91,7 @@ const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: Anal
         const formattedDate = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
         const row = [formattedDate];
         playlistNames.forEach(name => {
-          row.push(point[name] || 0); // Adiciona 0 se não houver dados para a playlist no dia
+          row.push(point[name] || 0);
         });
         return row;
       });
@@ -125,10 +125,15 @@ const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: Anal
         const chart = new (window as any).google.charts.Line(chartElement);
         chart.draw(data, (window as any).google.charts.Line.convertOptions(options));
       }
+    };
+    
+    if (typeof window !== 'undefined' && (window as any).google && (window as any).google.charts) {
+      (window as any).google.charts.load('current', { packages: ['line'] });
+      (window as any).google.charts.setOnLoadCallback(drawChart);
     }
     
-    // Redesenha o gráfico se os dados mudarem
-    if (analyticsData.length > 0) {
+    // Redesenha o gráfico se os dados mudarem e a biblioteca estiver carregada
+    if (analyticsData.length > 0 && typeof window !== 'undefined' && (window as any).google?.visualization) {
       drawChart();
     }
   }, [analyticsData, playlistNames]);
