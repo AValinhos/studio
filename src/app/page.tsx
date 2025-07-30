@@ -13,7 +13,6 @@ import { BarChart, Tv, Clapperboard, ListMusic, Loader2 } from 'lucide-react';
 import { Line, XAxis, YAxis, CartesianGrid, LineChart as RechartsLineChart } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import type { ChartConfig } from '@/components/ui/chart';
-import { Bar, BarChart as RechartsBarChart } from 'recharts';
 
 export interface MediaItem {
   id: string;
