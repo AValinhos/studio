@@ -278,7 +278,7 @@ const ChartLegendContent = React.forwardRef<
     }
 >(
   (
-    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey, onLegendItemClick, hiddenDataKeys = [] },
+    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey, onLegendItemClick },
     ref
   ) => {
     const { config } = useChart()
@@ -300,14 +300,12 @@ const ChartLegendContent = React.forwardRef<
           const key = `${nameKey || item.dataKey || "value"}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
           const color = item.color;
-          const isHidden = hiddenDataKeys.includes(item.dataKey as string);
-
+          
           return (
             <div
               key={item.value as string}
               className={cn(
                 "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
-                isHidden ? "opacity-50" : "opacity-100",
                 "cursor-pointer"
               )}
               onClick={(e) => {
