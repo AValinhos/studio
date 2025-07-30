@@ -128,13 +128,13 @@ export default function Dashboard() {
       return { totalExposureMinutes: 0, mostViewedItemName: 'N/A' };
     }
 
-    const exposureCount: { [key: string]: number } = {};
     let totalSeconds = 0;
+    const exposureCount: { [key: string]: number } = {};
     
     playlists.forEach(playlist => {
       playlist.items.forEach(item => {
-        exposureCount[item.mediaId] = (exposureCount[item.mediaId] || 0) + item.duration;
         totalSeconds += item.duration;
+        exposureCount[item.mediaId] = (exposureCount[item.mediaId] || 0) + item.duration;
       });
     });
 
