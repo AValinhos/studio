@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -10,9 +8,6 @@ import MediaManager from '@/components/MediaManager';
 import PlaylistManager from '@/components/PlaylistManager';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { BarChart, Tv, Clapperboard, ListMusic, Loader2 } from 'lucide-react';
-import { Line, XAxis, YAxis, CartesianGrid, LineChart as RechartsLineChart } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
-import type { ChartConfig } from '@/components/ui/chart';
 
 export interface MediaItem {
   id: string;
@@ -76,18 +71,77 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 }
 
 
+const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: AnalyticsDataPoint[], playlistNames: string[] }) => {
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).google && (window as any).google.charts) {
+      (window as any).google.charts.load('current', { packages: ['line'] });
+      (window as any).google.charts.setOnLoadCallback(drawChart);
+    }
+
+    function drawChart() {
+      const data = new (window as any).google.visualization.DataTable();
+      data.addColumn('string', 'Dia');
+      playlistNames.forEach(name => {
+        data.addColumn('number', name);
+      });
+
+      const rows = analyticsData.map(point => {
+        const date = new Date(point.date);
+        date.setDate(date.getDate() + 1);
+        const formattedDate = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        const row = [formattedDate];
+        playlistNames.forEach(name => {
+          row.push(point[name] || 0); // Adiciona 0 se não houver dados para a playlist no dia
+        });
+        return row;
+      });
+
+      data.addRows(rows);
+
+      const options = {
+        chart: {
+          title: 'Evolução da Duração por Playlist',
+          subtitle: 'em minutos'
+        },
+        height: 300,
+        colors: ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'],
+        backgroundColor: 'transparent',
+        titleTextStyle: {
+           color: 'hsl(var(--foreground))'
+        },
+        legendTextStyle: {
+          color: 'hsl(var(--foreground))'
+        },
+        hAxis: {
+          textStyle: {color: 'hsl(var(--muted-foreground))'}
+        },
+        vAxis: {
+          textStyle: {color: 'hsl(var(--muted-foreground))'}
+        }
+      };
+      
+      const chartElement = document.getElementById('line_chart');
+      if (chartElement) {
+        const chart = new (window as any).google.charts.Line(chartElement);
+        chart.draw(data, (window as any).google.charts.Line.convertOptions(options));
+      }
+    }
+    
+    // Redesenha o gráfico se os dados mudarem
+    if (analyticsData.length > 0) {
+      drawChart();
+    }
+  }, [analyticsData, playlistNames]);
+
+  return <div id="line_chart" style={{ width: '100%', minHeight: '300px' }}></div>;
+};
+
+
 export default function Dashboard() {
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [analyticsData, setAnalyticsData] = useState<AnalyticsDataPoint[]>([]);
-  const [hiddenPlaylists, setHiddenPlaylists] = useState<string[]>([]);
-  
-  const handleLegendItemClick = (dataKey: string) => {
-    setHiddenPlaylists(prev => 
-      prev.includes(dataKey) ? prev.filter(k => k !== dataKey) : [...prev, dataKey]
-    );
-  };
 
   const fetchData = async () => {
     try {
@@ -168,18 +222,6 @@ export default function Dashboard() {
   }, [playlists, mediaItems, isLoading]);
   
    const playlistNames = useMemo(() => playlists.map(p => p.name), [playlists]);
-   const colors = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
-
-   const chartConfig = useMemo(() => {
-    const config: ChartConfig = {};
-    playlistNames.forEach((name, index) => {
-        config[name] = {
-            label: name,
-            color: colors[index % colors.length],
-        };
-    });
-    return config;
-   }, [playlistNames]);
 
   return (
     <AuthGuard>
@@ -253,40 +295,7 @@ export default function Dashboard() {
                             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                         </div>
                      ) : (
-                        <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
-                            <RechartsLineChart data={analyticsData} accessibilityLayer>
-                                <CartesianGrid vertical={false} />
-                                <XAxis
-                                    dataKey="date"
-                                    tickLine={false}
-                                    tickMargin={10}
-                                    axisLine={false}
-                                    tickFormatter={(value) => {
-                                        const date = new Date(value);
-                                        // Adiciona um dia para corrigir a data
-                                        date.setDate(date.getDate() + 1);
-                                        return date.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'});
-                                    }}
-                                />
-                                <YAxis />
-                                <ChartTooltip content={<ChartTooltipContent />} />
-                                 <ChartLegend content={<ChartLegendContent onLegendItemClick={handleLegendItemClick} />} />
-                                 {Object.keys(chartConfig).map((key) => {
-                                      if (hiddenPlaylists.includes(key)) return null;
-                                      return (
-                                          <Line 
-                                              key={key}
-                                              type="monotone" 
-                                              dataKey={key}
-                                              stroke={chartConfig[key].color}
-                                              strokeWidth={2} 
-                                              dot={false}
-                                              name={chartConfig[key].label as string}
-                                          />
-                                      );
-                                  })}
-                            </RechartsLineChart>
-                        </ChartContainer>
+                        <GoogleLineChart analyticsData={analyticsData} playlistNames={playlistNames} />
                      )}
                   </CardContent>
                 </Card>
