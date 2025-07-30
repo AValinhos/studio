@@ -113,6 +113,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
   useEffect(() => {
@@ -269,7 +270,7 @@ export default function Dashboard() {
                                 />
                                 <YAxis />
                                 <ChartTooltip content={<ChartTooltipContent />} />
-                                 <ChartLegend content={<ChartLegendContent onLegendItemClick={handleLegendItemClick} />} />
+                                 <ChartLegend content={<ChartLegendContent onLegendItemClick={handleLegendItemClick} hiddenDataKeys={hiddenPlaylists}/>} />
                                  {Object.keys(chartConfig).map((key) => {
                                       if (hiddenPlaylists.includes(key)) return null;
                                       return (

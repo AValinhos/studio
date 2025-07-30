@@ -273,11 +273,12 @@ const ChartLegendContent = React.forwardRef<
     Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
       hideIcon?: boolean
       nameKey?: string
-      onLegendItemClick?: (dataKey: string, e: React.MouseEvent) => void;
+      onLegendItemClick?: (dataKey: string) => void;
+      hiddenDataKeys?: string[];
     }
 >(
   (
-    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey, onLegendItemClick },
+    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey, onLegendItemClick, hiddenDataKeys = [] },
     ref
   ) => {
     const { config } = useChart()
@@ -299,19 +300,19 @@ const ChartLegendContent = React.forwardRef<
           const key = `${nameKey || item.dataKey || "value"}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
           const color = item.color;
-          const inactive = item.inactive
+          const isHidden = hiddenDataKeys.includes(item.dataKey as string);
 
           return (
             <div
               key={item.value as string}
               className={cn(
                 "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
-                inactive ? "opacity-50" : "opacity-100",
+                isHidden ? "opacity-50" : "opacity-100",
                 "cursor-pointer"
               )}
               onClick={(e) => {
                   e.preventDefault();
-                  onLegendItemClick?.(item.dataKey as string, e);
+                  onLegendItemClick?.(item.dataKey as string);
               }}
             >
               {itemConfig?.icon && !hideIcon ? (
