@@ -270,7 +270,7 @@ export default function Dashboard() {
                                 />
                                 <YAxis />
                                 <ChartTooltip content={<ChartTooltipContent />} />
-                                 <ChartLegend content={<ChartLegendContent onLegendItemClick={handleLegendItemClick} hiddenDataKeys={hiddenPlaylists}/>} />
+                                 <ChartLegend content={<ChartLegendContent onLegendItemClick={handleLegendItemClick} />} />
                                  {Object.keys(chartConfig).map((key) => {
                                       if (hiddenPlaylists.includes(key)) return null;
                                       return (

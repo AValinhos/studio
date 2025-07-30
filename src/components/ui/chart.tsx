@@ -271,20 +271,19 @@ const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> &
     Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
-      hideIcon?: boolean;
-      nameKey?: string;
-      onLegendItemClick?: (dataKey: string) => void;
-      hiddenDataKeys?: string[];
+      hideIcon?: boolean
+      nameKey?: string
+      onLegendItemClick?: (dataKey: string) => void
     }
 >(
   (
-    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey, onLegendItemClick, hiddenDataKeys = [] },
+    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey, onLegendItemClick },
     ref
   ) => {
-    const { config } = useChart();
+    const { config } = useChart()
 
     if (!payload?.length) {
-      return null;
+      return null
     }
 
     return (
@@ -297,10 +296,9 @@ const ChartLegendContent = React.forwardRef<
         )}
       >
         {payload.map((item) => {
-          const key = `${nameKey || item.dataKey || "value"}`;
-          const itemConfig = getPayloadConfigFromPayload(config, item, key);
-          const color = item.color;
-          const isHidden = hiddenDataKeys.includes(item.dataKey as string);
+          const key = `${nameKey || item.dataKey || "value"}`
+          const itemConfig = getPayloadConfigFromPayload(config, item, key)
+          const color = item.color
 
           return (
             <div
@@ -310,27 +308,27 @@ const ChartLegendContent = React.forwardRef<
                 "cursor-pointer"
               )}
               onClick={(e) => {
-                e.preventDefault();
-                onLegendItemClick?.(item.dataKey as string);
+                e.preventDefault()
+                onLegendItemClick?.(item.dataKey as string)
               }}
             >
               <div
                 className="h-2 w-2 shrink-0 rounded-[2px]"
                 style={{
-                  backgroundColor: isHidden ? "hsl(var(--muted))" : color,
+                  backgroundColor: color,
                 }}
               />
-              <span className={cn(isHidden ? "text-muted-foreground" : "text-foreground")}>
+              <span className="text-foreground">
                 {itemConfig?.label}
               </span>
             </div>
-          );
+          )
         })}
       </div>
-    );
+    )
   }
-);
-ChartLegendContent.displayName = "ChartLegend";
+)
+ChartLegendContent.displayName = "ChartLegend"
 
 // Helper to extract item config from a payload.
 function getPayloadConfigFromPayload(
