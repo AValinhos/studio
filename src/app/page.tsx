@@ -71,78 +71,6 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-
-const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: AnalyticsDataPoint[] | null, playlistNames: string[] | null }) => {
-  
-  useEffect(() => {
-    const drawChart = () => {
-      // @ts-ignore
-      if (!window.google || !window.google.visualization || !analyticsData || !playlistNames) return;
-
-      // @ts-ignore
-      const data = new window.google.visualization.DataTable();
-      data.addColumn('string', 'Dia');
-      playlistNames.forEach(name => {
-        data.addColumn('number', name);
-      });
-
-      const rows = analyticsData.map(point => {
-        const date = new Date(point.date);
-        date.setUTCHours(0, 0, 0, 0);
-        const formattedDate = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' });
-        const row: (string | number)[] = [formattedDate];
-        playlistNames.forEach(name => {
-          row.push(point[name] || 0);
-        });
-        return row;
-      });
-
-      data.addRows(rows);
-
-      const options = {
-        height: 300,
-        colors: ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'],
-        backgroundColor: 'transparent',
-        titleTextStyle: {
-           color: 'hsl(var(--foreground))'
-        },
-        subtitleTextStyle: {
-           color: 'hsl(var(--muted-foreground))'
-        },
-        legendTextStyle: {
-          color: 'hsl(var(--foreground))'
-        },
-        hAxis: {
-          textStyle: {color: 'hsl(var(--muted-foreground))'}
-        },
-        vAxis: {
-          textStyle: {color: 'hsl(var(--muted-foreground))'}
-        }
-      };
-      
-      const chartElement = document.getElementById('line_chart');
-      if (chartElement) {
-        // @ts-ignore
-        const chart = new window.google.charts.Line(chartElement);
-        // @ts-ignore
-        chart.draw(data, window.google.charts.Line.convertOptions(options));
-      }
-    };
-    
-    // @ts-ignore
-    if (typeof window.google !== 'undefined' && typeof window.google.charts !== 'undefined') {
-        // @ts-ignore
-        google.charts.load('current', { 'packages': ['line'] });
-        // @ts-ignore
-        google.charts.setOnLoadCallback(drawChart);
-    }
-
-  }, [analyticsData, playlistNames]);
-
-  return <div id="line_chart" style={{ width: '100%', minHeight: '300px' }}></div>;
-};
-
-
 export default function Dashboard() {
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
@@ -276,8 +204,8 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </div>
-          <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
-            <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
+          <div className="grid gap-4 md:gap-8 lg:grid-cols-1">
+            <div className="grid auto-rows-max items-start gap-4 md:gap-8">
               <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
                 <ContentUploader onContentSaved={fetchData} />
                 <PlaylistManager 
@@ -288,23 +216,6 @@ export default function Dashboard() {
                 />
               </div>
               <MediaManager mediaItems={mediaItems} onMediaUpdate={fetchData} isLoading={isLoading}/>
-            </div>
-            <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-1 xl:col-span-1">
-               <Card>
-                  <CardHeader>
-                    <CardTitle>Evolução da Duração por Playlist</CardTitle>
-                    <CardDescription>Duração total (em minutos) de cada playlist ao longo dos dias.</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {isLoading || !analyticsData || playlistNames.length === 0 ? (
-                      <div className="flex justify-center items-center h-[300px]">
-                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                      </div>
-                    ) : (
-                     <GoogleLineChart analyticsData={analyticsData} playlistNames={playlistNames} />
-                    )}
-                  </CardContent>
-                </Card>
             </div>
           </div>
         </main>
