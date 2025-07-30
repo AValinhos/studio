@@ -81,6 +81,7 @@ export default function Dashboard() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [analyticsData, setAnalyticsData] = useState<AnalyticsDataPoint[]>([]);
+  const [hiddenPlaylists, setHiddenPlaylists] = useState<string[]>([]);
 
   const fetchData = async () => {
     try {
@@ -90,7 +91,9 @@ export default function Dashboard() {
       const data = await res.json();
       setMediaItems(data.mediaItems || []);
       setPlaylists(data.playlists || []);
-      
+      // Initially, hide all playlists in the chart
+      setHiddenPlaylists(data.playlists.map((p: Playlist) => p.name.replace(/\s+/g, '-')));
+
       const analyticsRes = await fetch('/api/analytics');
       if(analyticsRes.ok) {
         const analytics = await analyticsRes.json();
@@ -254,16 +257,37 @@ export default function Dashboard() {
                                 />
                                 <YAxis />
                                 <ChartTooltip content={<ChartTooltipContent />} />
-                                 <ChartLegend content={<ChartLegendContent />} />
+                                 <ChartLegend
+                                    content={<ChartLegendContent 
+                                        onMouseLeave={() => {}}
+                                        onMouseEnter={() => {}}
+                                        onClick={(item) => {
+                                            setHiddenPlaylists(prev => 
+                                                prev.includes(item.dataKey)
+                                                ? prev.filter(key => key !== item.dataKey)
+                                                : [...prev, item.dataKey]
+                                            )
+                                        }}
+                                        payload={Object.keys(chartConfig).map(key => ({
+                                            dataKey: key,
+                                            value: chartConfig[key].label,
+                                            color: chartConfig[key].color,
+                                            inactive: hiddenPlaylists.includes(key),
+                                            type: 'line'
+                                        }))}
+                                    />} 
+                                 />
                                  {Object.keys(chartConfig).map((key) => (
-                                    <Line 
-                                        key={key}
-                                        type="monotone" 
-                                        dataKey={key.replace(/-/g, ' ')} 
-                                        stroke={chartConfig[key].color}
-                                        strokeWidth={2} 
-                                        dot={false} 
-                                    />
+                                    !hiddenPlaylists.includes(key) && (
+                                        <Line 
+                                            key={key}
+                                            type="monotone" 
+                                            dataKey={key.replace(/-/g, ' ')} 
+                                            stroke={chartConfig[key].color}
+                                            strokeWidth={2} 
+                                            dot={false} 
+                                        />
+                                    )
                                 ))}
                             </RechartsLineChart>
                         </ChartContainer>

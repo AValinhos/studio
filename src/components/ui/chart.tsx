@@ -270,13 +270,13 @@ const ChartLegend = RechartsPrimitive.Legend
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> &
-    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
+    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign" | "onClick" | "onMouseEnter" | "onMouseLeave"> & {
       hideIcon?: boolean
       nameKey?: string
     }
 >(
   (
-    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey },
+    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey, onClick, onMouseEnter, onMouseLeave },
     ref
   ) => {
     const { config } = useChart()
@@ -297,14 +297,29 @@ const ChartLegendContent = React.forwardRef<
         {payload.map((item) => {
           const key = `${nameKey || item.dataKey || "value"}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
-          const color = itemConfig?.color || item.color;
+          const color = item.color;
 
           return (
             <div
-              key={item.value}
+              key={item.value as string}
               className={cn(
-                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground"
+                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
+                (item as any).inactive ? "opacity-50" : "opacity-100",
+                "cursor-pointer"
               )}
+              onClick={(e) => {
+                e.preventDefault();
+                onClick?.(item, payload.indexOf(item));
+              }}
+              onMouseEnter={(e) => {
+                  e.preventDefault();
+                  onMouseEnter?.(item, payload.indexOf(item));
+              }}
+              onMouseLeave={(e) => {
+                    e.preventDefault();
+                    onMouseLeave?.(item, payload.indexOf(item));
+              }}
+
             >
               {itemConfig?.icon && !hideIcon ? (
                 <itemConfig.icon />
