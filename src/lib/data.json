@@ -92,6 +92,20 @@
       "footerText1": "noticia",
       "footerText2": "Noticia da carvalheira urgente",
       "footerBgColor": "#53dd2c"
+    },
+    {
+      "id": "1753821883026",
+      "name": "ifreme 02",
+      "date": "2025-07-29",
+      "type": "Iframe",
+      "src": "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/pPEXuOtf-MM?si=9LsVTAY9D36nCCEd\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>",
+      "content": "",
+      "subContent": "",
+      "bgColor": "#228B22",
+      "showFooter": true,
+      "footerText1": "noticia",
+      "footerText2": "rodeio",
+      "footerBgColor": "#2c41dd"
     }
   ],
   "playlists": [
@@ -114,6 +128,10 @@
         {
           "mediaId": "1753820733211",
           "duration": 8
+        },
+        {
+          "mediaId": "1753821883026",
+          "duration": 10
         }
       ]
     },

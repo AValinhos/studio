@@ -89,7 +89,7 @@ const extractSrcFromIframe = (iframeString: string): string => {
         if (url.hostname.includes('vimeo.com')) {
              url.searchParams.set('autoplay', '1');
              url.searchParams.set('muted', '1'); // Vimeo usa 'muted'
-             url.search_params.set('loop', '1');
+             url.searchParams.set('loop', '1');
              return url.toString();
         }
         return url.toString();
