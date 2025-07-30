@@ -9,6 +9,9 @@ import MediaManager from '@/components/MediaManager';
 import PlaylistManager from '@/components/PlaylistManager';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { BarChart, Tv, Clapperboard, ListMusic, Loader2 } from 'lucide-react';
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
+
 
 export interface MediaItem {
   id: string;
@@ -40,8 +43,77 @@ export interface Playlist {
 
 export interface AnalyticsDataPoint {
     date: string;
-    [key: string]: any; // Permite nomes de playlist dinâmicos
+    [key: string]: any; 
 }
+
+
+function AnalyticsChart({ analyticsData, playlistNames, chartConfig }: { analyticsData: AnalyticsDataPoint[] | null, playlistNames: string[], chartConfig: any }) {
+  const [hiddenPlaylists, setHiddenPlaylists] = useState<string[]>([]);
+
+  const handleLegendItemClick = (dataKey: string) => {
+    setHiddenPlaylists(prev => 
+      prev.includes(dataKey) ? prev.filter(name => name !== dataKey) : [...prev, dataKey]
+    );
+  };
+  
+  if (!analyticsData || analyticsData.length === 0) {
+    return (
+      <div className="flex h-80 w-full items-center justify-center text-muted-foreground">
+        <p>Dados de analytics insuficientes para exibir o gráfico.</p>
+      </div>
+    );
+  }
+
+  const chartData = analyticsData.map(d => ({
+    ...d,
+    date: new Date(d.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+  }));
+
+
+  return (
+     <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+      <AreaChart data={chartData}>
+        <defs>
+          {Object.keys(chartConfig).map((key, index) => (
+            <linearGradient key={key} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={`hsl(var(--chart-${index+1}))`} stopOpacity={0.8} />
+              <stop offset="95%" stopColor={`hsl(var(--chart-${index+1}))`} stopOpacity={0.1} />
+            </linearGradient>
+          ))}
+        </defs>
+        <CartesianGrid vertical={false} />
+        <XAxis
+          dataKey="date"
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+          tickFormatter={(value) => value}
+        />
+        <YAxis
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+          tickFormatter={(value) => `${value} min`}
+        />
+        <Tooltip content={<ChartTooltipContent indicator="dot" />} />
+        <Legend content={<ChartLegendContent onClick={(payload) => handleLegendItemClick(payload.dataKey as string)} />} />
+        {playlistNames.map((name, index) => (
+          !hiddenPlaylists.includes(name) && (
+            <Area
+              key={name}
+              dataKey={name}
+              type="natural"
+              fill={`url(#fill-${name})`}
+              stroke={`hsl(var(--chart-${index+1}))`}
+              stackId="1"
+            />
+          )
+        ))}
+      </AreaChart>
+    </ChartContainer>
+  );
+}
+
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -89,6 +161,8 @@ export default function Dashboard() {
       const analyticsRes = await fetch('/api/analytics');
       if(analyticsRes.ok) {
         const analytics = await analyticsRes.json();
+        // Sort data chronologically
+        analytics.sort((a: AnalyticsDataPoint, b: AnalyticsDataPoint) => new Date(a.date).getTime() - new Date(b.date).getTime());
         setAnalyticsData(analytics);
       }
       
@@ -109,17 +183,16 @@ export default function Dashboard() {
     const lastUpdate = localStorage.getItem('lastAnalyticsUpdate');
 
     if (lastUpdate !== today && !isLoading) {
-        // Enviar os dados de analytics do dia
         fetch('/api/analytics', { method: 'POST' })
             .then(res => {
                 if (res.ok) {
                     localStorage.setItem('lastAnalyticsUpdate', today);
-                    // Refresh analytics data after posting
-                    fetch('/api/analytics').then(res => res.json()).then(setAnalyticsData);
+                    fetchData(); // Refresh all data after posting
                 }
             })
             .catch(err => console.error("Falha ao atualizar analytics:", err));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
 
 
@@ -156,6 +229,17 @@ export default function Dashboard() {
   }, [playlists, mediaItems, isLoading]);
   
    const playlistNames = useMemo(() => playlists.length > 0 ? playlists.map(p => p.name) : [], [playlists]);
+
+   const chartConfig = useMemo(() => {
+    const config: { [key: string]: { label: string, color: string } } = {};
+    playlistNames.forEach((name, index) => {
+      config[name] = {
+        label: name,
+        color: `hsl(var(--chart-${index + 1}))`,
+      };
+    });
+    return config;
+  }, [playlistNames]);
 
   return (
     <AuthGuard>
@@ -204,6 +288,29 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </div>
+          
+          <div className="grid gap-4 md:gap-8 lg:grid-cols-1">
+             <Card>
+              <CardHeader>
+                <CardTitle>Evolução do Tempo de Uso</CardTitle>
+                <CardDescription>Tempo de exibição total por playlist (em minutos) nos últimos dias.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                 {isLoading ? (
+                  <div className="flex h-80 w-full items-center justify-center">
+                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  <AnalyticsChart 
+                    analyticsData={analyticsData} 
+                    playlistNames={playlistNames}
+                    chartConfig={chartConfig}
+                  />
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
           <div className="grid gap-4 md:gap-8 lg:grid-cols-1">
             <div className="grid auto-rows-max items-start gap-4 md:gap-8">
               <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
