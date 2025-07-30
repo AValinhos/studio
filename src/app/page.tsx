@@ -91,9 +91,7 @@ export default function Dashboard() {
       const data = await res.json();
       setMediaItems(data.mediaItems || []);
       setPlaylists(data.playlists || []);
-      // Initially, hide all playlists in the chart
-      setHiddenPlaylists(data.playlists.map((p: Playlist) => p.name.replace(/\s+/g, '-')));
-
+      
       const analyticsRes = await fetch('/api/analytics');
       if(analyticsRes.ok) {
         const analytics = await analyticsRes.json();
@@ -164,8 +162,7 @@ export default function Dashboard() {
    const chartConfig = useMemo(() => {
     const config: ChartConfig = {};
     playlistNames.forEach((name, index) => {
-        const sanitizedName = name.replace(/\s+/g, '-');
-        config[sanitizedName] = {
+        config[name] = {
             label: name,
             color: colors[index % colors.length],
         };
@@ -259,22 +256,14 @@ export default function Dashboard() {
                                 <ChartTooltip content={<ChartTooltipContent />} />
                                  <ChartLegend
                                     content={<ChartLegendContent 
-                                        onMouseLeave={() => {}}
-                                        onMouseEnter={() => {}}
                                         onClick={(item) => {
+                                            const key = item.dataKey as string;
                                             setHiddenPlaylists(prev => 
-                                                prev.includes(item.dataKey)
-                                                ? prev.filter(key => key !== item.dataKey)
-                                                : [...prev, item.dataKey]
+                                                prev.includes(key)
+                                                ? prev.filter(k => k !== key)
+                                                : [...prev, key]
                                             )
                                         }}
-                                        payload={Object.keys(chartConfig).map(key => ({
-                                            dataKey: key,
-                                            value: chartConfig[key].label,
-                                            color: chartConfig[key].color,
-                                            inactive: hiddenPlaylists.includes(key),
-                                            type: 'line'
-                                        }))}
                                     />} 
                                  />
                                  {Object.keys(chartConfig).map((key) => (
@@ -282,10 +271,11 @@ export default function Dashboard() {
                                         <Line 
                                             key={key}
                                             type="monotone" 
-                                            dataKey={key.replace(/-/g, ' ')} 
+                                            dataKey={key}
                                             stroke={chartConfig[key].color}
                                             strokeWidth={2} 
-                                            dot={false} 
+                                            dot={false}
+                                            name={chartConfig[key].label as string}
                                         />
                                     )
                                 ))}
