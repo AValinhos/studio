@@ -222,8 +222,8 @@ const ChartTooltipContent = React.forwardRef<
                           )}
                           style={
                             {
-                              "--color-bg": payloadColor,
-                              "--color-border": payloadColor,
+                              "--color-bg": `hsl(var(${payloadColor}))`,
+                              "--color-border": `hsl(var(${payloadColor}))`,
                             } as React.CSSProperties
                           }
                         />
@@ -306,7 +306,7 @@ const ChartLegendContent = React.forwardRef<
                 <div
                   className="h-2 w-2 shrink-0 rounded-[2px]"
                   style={{
-                    backgroundColor: color,
+                    backgroundColor: `hsl(var(${color}))`,
                   }}
                 />
               )}

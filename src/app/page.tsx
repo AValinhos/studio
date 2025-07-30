@@ -161,7 +161,7 @@ export default function Dashboard() {
     playlistNames.forEach((name, index) => {
         config[name] = {
             label: name,
-            color: colors[index % colors.length],
+            color: `hsl(${colors[index % colors.length].slice(1)})`,
         };
     });
     return config;

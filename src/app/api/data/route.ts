@@ -26,9 +26,8 @@ async function writeData(data: any) {
 
 async function updateAnalytics() {
     try {
-        // Esta URL precisa ser absoluta quando chamada do lado do servidor
-        const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:9002';
-        await fetch(`${baseUrl}/api/analytics`, {
+        const host = process.env.NEXT_PUBLIC_HOST_URL || `http://localhost:9002`;
+        await fetch(`${host}/api/analytics`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
         });

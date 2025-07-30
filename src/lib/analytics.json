@@ -1,4 +1,3 @@
-
 [
   {
     "date": "2024-07-28",
@@ -11,10 +10,16 @@
     "Sala de Reunião": 35,
     "Cafeteria": 15
   },
-    {
+  {
     "date": "2024-07-30",
     "Lobby Principal": 30,
     "Sala de Reunião": 40,
     "Cafeteria": 20
+  },
+  {
+    "date": "2025-07-30",
+    "Lobby Principal": 1,
+    "Rodeio": 1,
+    "Xineray": 0
   }
 ]
