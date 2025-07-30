@@ -73,71 +73,71 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
 
 const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: AnalyticsDataPoint[], playlistNames: string[] }) => {
-  useEffect(() => {
-    if (typeof window === 'undefined' || !(window as any).google || !(window as any).google.charts) {
-      return;
+  const drawChart = () => {
+    if (typeof window.google === 'undefined' || typeof window.google.visualization === 'undefined') {
+        // Se a biblioteca não estiver pronta, aguarde.
+        return;
     }
 
-    const drawChart = () => {
-      const data = new (window as any).google.visualization.DataTable();
-      data.addColumn('string', 'Dia');
+    const data = new window.google.visualization.DataTable();
+    data.addColumn('string', 'Dia');
+    playlistNames.forEach(name => {
+      data.addColumn('number', name);
+    });
+
+    const rows = analyticsData.map(point => {
+      const date = new Date(point.date);
+      date.setUTCHours(0, 0, 0, 0);
+      const formattedDate = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' });
+      const row: (string | number)[] = [formattedDate];
       playlistNames.forEach(name => {
-        data.addColumn('number', name);
+        row.push(point[name] || 0);
       });
+      return row;
+    });
 
-      const rows = analyticsData.map(point => {
-        const date = new Date(point.date);
-        // Ajuste para garantir que a data seja interpretada corretamente como UTC
-        date.setUTCHours(0, 0, 0, 0);
-        const formattedDate = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' });
-        const row: (string | number)[] = [formattedDate];
-        playlistNames.forEach(name => {
-          row.push(point[name] || 0);
-        });
-        return row;
-      });
+    data.addRows(rows);
 
-      data.addRows(rows);
-
-      const options = {
-        chart: {
-          title: 'Evolução da Duração por Playlist',
-          subtitle: 'em minutos'
-        },
-        height: 300,
-        colors: ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'],
-        backgroundColor: 'transparent',
-        titleTextStyle: {
-           color: 'hsl(var(--foreground))'
-        },
-        subtitleTextStyle: {
-           color: 'hsl(var(--muted-foreground))'
-        },
-        legendTextStyle: {
-          color: 'hsl(var(--foreground))'
-        },
-        hAxis: {
-          textStyle: {color: 'hsl(var(--muted-foreground))'}
-        },
-        vAxis: {
-          textStyle: {color: 'hsl(var(--muted-foreground))'}
-        }
-      };
-      
-      const chartElement = document.getElementById('line_chart');
-      if (chartElement) {
-        // A biblioteca 'line' é para o Material Chart. Para o Classic Chart, seria 'corechart'
-        const chart = new (window as any).google.charts.Line(chartElement);
-        chart.draw(data, (window as any).google.charts.Line.convertOptions(options));
+    const options = {
+      chart: {
+        title: 'Evolução da Duração por Playlist',
+        subtitle: 'em minutos'
+      },
+      height: 300,
+      colors: ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'],
+      backgroundColor: 'transparent',
+      titleTextStyle: {
+         color: 'hsl(var(--foreground))'
+      },
+      subtitleTextStyle: {
+         color: 'hsl(var(--muted-foreground))'
+      },
+      legendTextStyle: {
+        color: 'hsl(var(--foreground))'
+      },
+      hAxis: {
+        textStyle: {color: 'hsl(var(--muted-foreground))'}
+      },
+      vAxis: {
+        textStyle: {color: 'hsl(var(--muted-foreground))'}
       }
     };
     
-    // Garante que o carregamento e o callback sejam definidos apenas uma vez
-    if ((window as any).google.charts.setOnLoadCallback) {
-        (window as any).google.charts.load('current', { packages: ['line'] });
-        (window as any).google.charts.setOnLoadCallback(drawChart);
+    const chartElement = document.getElementById('line_chart');
+    if (chartElement) {
+      const chart = new window.google.charts.Line(chartElement);
+      chart.draw(data, window.google.charts.Line.convertOptions(options));
     }
+  };
+  
+  useEffect(() => {
+    if (typeof window.google === 'undefined') {
+      return;
+    }
+    google.charts.load('current', { 'packages': ['line'] });
+    google.charts.setOnLoadCallback(drawChart);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [analyticsData, playlistNames]);
 
   return <div id="line_chart" style={{ width: '100%', minHeight: '300px' }}></div>;
