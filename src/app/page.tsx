@@ -250,7 +250,12 @@ export default function Dashboard() {
                                     tickLine={false}
                                     tickMargin={10}
                                     axisLine={false}
-                                    tickFormatter={(value) => new Date(value).toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'})}
+                                    tickFormatter={(value) => {
+                                        const date = new Date(value);
+                                        // Adiciona um dia para corrigir a data
+                                        date.setDate(date.getDate() + 1);
+                                        return date.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'});
+                                    }}
                                 />
                                 <YAxis />
                                 <ChartTooltip content={<ChartTooltipContent />} />
