@@ -42,7 +42,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, FileUp, Loader2, Edit, Trash2 } from 'lucide-react';
+import { MoreHorizontal, FileUp, Loader2, Edit, Trash2, Link, Upload } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -51,6 +51,7 @@ import { MediaItem } from '@/app/page';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './ui/select';
 import { Separator } from './ui/separator';
 import { Switch } from './ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
 interface MediaManagerProps {
   mediaItems: MediaItem[];
@@ -186,6 +187,17 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
       toast({ variant: "destructive", title: "Erro", description: error.message });
     } finally {
       setIsProcessing(false);
+    }
+  };
+  
+  const handleFooterImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFooterImageSrc(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -418,7 +430,7 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
                     </div>
 
                     {showFooter && (
-                        <div className="space-y-4">
+                        <div className="space-y-4 pt-4">
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="footer-text1" className="text-right">Texto 1</Label>
                                 <Input id="footer-text1" value={footerText1} onChange={(e) => setFooterText1(e.target.value)} className="col-span-3" placeholder="Ex: URGENTE"/>
@@ -431,9 +443,21 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
                                 <Label htmlFor="footer-bgcolor" className="text-right">Cor de Fundo</Label>
                                 <Input id="footer-bgcolor" type="color" value={footerBgColor} onChange={(e) => setFooterBgColor(e.target.value)} className="col-span-3 p-1 h-10"/>
                             </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="footer-image" className="text-right">URL da Imagem</Label>
-                                <Input id="footer-image" value={footerImageSrc} onChange={(e) => setFooterImageSrc(e.target.value)} className="col-span-3" placeholder="https://example.com/logo.png"/>
+                            
+                            <div className="grid grid-cols-4 items-start gap-4">
+                                <Label htmlFor="footer-image-tabs" className="text-right pt-2">Imagem</Label>
+                                <Tabs defaultValue="url" className="col-span-3">
+                                    <TabsList className="grid w-full grid-cols-2">
+                                        <TabsTrigger value="url"><Link className="mr-2 h-4 w-4"/>URL</TabsTrigger>
+                                        <TabsTrigger value="upload"><Upload className="mr-2 h-4 w-4"/>Upload</TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="url" className='pt-2'>
+                                        <Input id="footer-image" value={footerImageSrc} onChange={(e) => setFooterImageSrc(e.target.value)} placeholder="https://example.com/logo.png"/>
+                                    </TabsContent>
+                                    <TabsContent value="upload" className='pt-2'>
+                                        <Input id="footer-image-file" type="file" accept="image/*" onChange={handleFooterImageFileChange} />
+                                    </TabsContent>
+                                </Tabs>
                             </div>
                         </div>
                     )}
