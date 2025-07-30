@@ -270,13 +270,14 @@ const ChartLegend = RechartsPrimitive.Legend
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> &
-    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign" | "onClick" | "onMouseEnter" | "onMouseLeave"> & {
+    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
       hideIcon?: boolean
       nameKey?: string
+      onClick?: (item: RechartsPrimitive.Payload) => void;
     }
 >(
   (
-    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey, onClick, onMouseEnter, onMouseLeave },
+    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey, onClick },
     ref
   ) => {
     const { config } = useChart()
@@ -298,28 +299,20 @@ const ChartLegendContent = React.forwardRef<
           const key = `${nameKey || item.dataKey || "value"}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
           const color = item.color;
+          const inactive = item.inactive
 
           return (
             <div
               key={item.value as string}
               className={cn(
                 "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
-                (item as any).inactive ? "opacity-50" : "opacity-100",
+                inactive ? "opacity-50" : "opacity-100",
                 "cursor-pointer"
               )}
               onClick={(e) => {
-                e.preventDefault();
-                onClick?.(item, payload.indexOf(item));
+                e.preventDefault()
+                onClick?.(item)
               }}
-              onMouseEnter={(e) => {
-                  e.preventDefault();
-                  onMouseEnter?.(item, payload.indexOf(item));
-              }}
-              onMouseLeave={(e) => {
-                    e.preventDefault();
-                    onMouseLeave?.(item, payload.indexOf(item));
-              }}
-
             >
               {itemConfig?.icon && !hideIcon ? (
                 <itemConfig.icon />
@@ -380,7 +373,6 @@ function getPayloadConfigFromPayload(
     : config[key as keyof typeof config]
 }
 
-const Chart = RechartsPrimitive.ComposedChart
 const ChartYAxis = RechartsPrimitive.YAxis
 
 export {
@@ -390,6 +382,6 @@ export {
   ChartLegend,
   ChartLegendContent,
   ChartStyle,
-  Chart,
   ChartYAxis,
 }
+
