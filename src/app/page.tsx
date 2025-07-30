@@ -72,18 +72,15 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 }
 
 
-const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: AnalyticsDataPoint[], playlistNames: string[] }) => {
+const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: AnalyticsDataPoint[] | null, playlistNames: string[] | null }) => {
   
   useEffect(() => {
-    if (!analyticsData || analyticsData.length === 0 || !playlistNames || playlistNames.length === 0) {
-      return; 
-    }
     
     const drawChart = () => {
       // @ts-ignore
-      if (typeof window.google === 'undefined' || typeof window.google.visualization === 'undefined') {
-          return;
-      }
+      if (!window.google || !window.google.visualization) return;
+      if (!analyticsData || !playlistNames) return;
+
       // @ts-ignore
       const data = new window.google.visualization.DataTable();
       data.addColumn('string', 'Dia');
@@ -134,7 +131,7 @@ const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: Anal
       }
     };
     
-    // @ts-ignore
+     // @ts-ignore
     if (typeof window.google === 'undefined' || !window.google.charts) {
       return;
     }
@@ -146,6 +143,14 @@ const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: Anal
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [analyticsData, playlistNames]);
 
+  if (!analyticsData || !playlistNames || analyticsData.length === 0 || playlistNames.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-[300px]">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   return <div id="line_chart" style={{ width: '100%', minHeight: '300px' }}></div>;
 };
 
@@ -154,7 +159,7 @@ export default function Dashboard() {
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsDataPoint[]>([]);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsDataPoint[] | null>(null);
 
   const fetchData = async () => {
     try {
@@ -234,7 +239,7 @@ export default function Dashboard() {
     };
   }, [playlists, mediaItems, isLoading]);
   
-   const playlistNames = useMemo(() => playlists.map(p => p.name), [playlists]);
+   const playlistNames = useMemo(() => playlists.length > 0 ? playlists.map(p => p.name) : null, [playlists]);
 
   return (
     <AuthGuard>
@@ -303,13 +308,7 @@ export default function Dashboard() {
                     <CardDescription>Duração total (em minutos) de cada playlist ao longo dos dias.</CardDescription>
                   </CardHeader>
                   <CardContent>
-                     {isLoading || analyticsData.length === 0 || playlistNames.length === 0 ? (
-                        <div className="flex justify-center items-center h-[300px]">
-                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                        </div>
-                     ) : (
-                        <GoogleLineChart analyticsData={analyticsData} playlistNames={playlistNames} />
-                     )}
+                     <GoogleLineChart analyticsData={analyticsData} playlistNames={playlistNames} />
                   </CardContent>
                 </Card>
             </div>
@@ -319,3 +318,4 @@ export default function Dashboard() {
     </AuthGuard>
   );
 }
+
