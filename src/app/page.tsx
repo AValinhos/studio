@@ -12,7 +12,8 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/com
 import { BarChart, Tv, Clapperboard, ListMusic, Loader2 } from 'lucide-react';
 import { Line, XAxis, YAxis, CartesianGrid, LineChart as RechartsLineChart } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
-import type { ChartConfig, ChartProps } from '@/components/ui/chart';
+import type { ChartConfig } from '@/components/ui/chart';
+import { Bar, BarChart as RechartsBarChart } from 'recharts';
 
 export interface MediaItem {
   id: string;
@@ -81,6 +82,13 @@ export default function Dashboard() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [analyticsData, setAnalyticsData] = useState<AnalyticsDataPoint[]>([]);
+  const [hiddenPlaylists, setHiddenPlaylists] = useState<string[]>([]);
+  
+  const handleLegendItemClick = (dataKey: string) => {
+    setHiddenPlaylists(prev => 
+      prev.includes(dataKey) ? prev.filter(k => k !== dataKey) : [...prev, dataKey]
+    );
+  };
 
   const fetchData = async () => {
     try {
@@ -107,22 +115,25 @@ export default function Dashboard() {
   useEffect(() => {
     fetchData();
   }, []);
-
+  
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
     const lastUpdate = localStorage.getItem('lastAnalyticsUpdate');
 
-    if (lastUpdate !== today) {
+    if (lastUpdate !== today && !isLoading) {
         // Enviar os dados de analytics do dia
         fetch('/api/analytics', { method: 'POST' })
             .then(res => {
                 if (res.ok) {
                     localStorage.setItem('lastAnalyticsUpdate', today);
+                    // Refresh analytics data after posting
+                    fetch('/api/analytics').then(res => res.json()).then(setAnalyticsData);
                 }
             })
             .catch(err => console.error("Falha ao atualizar analytics:", err));
     }
-  }, []);
+  }, [isLoading]);
+
 
   const { totalExposureMinutes, mostViewedItemName } = useMemo(() => {
     if (isLoading || playlists.length === 0 || mediaItems.length === 0) {
@@ -259,18 +270,21 @@ export default function Dashboard() {
                                 />
                                 <YAxis />
                                 <ChartTooltip content={<ChartTooltipContent />} />
-                                 <ChartLegend content={<ChartLegendContent />} />
-                                 {Object.keys(chartConfig).map((key) => (
-                                    <Line 
-                                        key={key}
-                                        type="monotone" 
-                                        dataKey={key}
-                                        stroke={chartConfig[key].color}
-                                        strokeWidth={2} 
-                                        dot={false}
-                                        name={chartConfig[key].label as string}
-                                    />
-                                ))}
+                                 <ChartLegend content={<ChartLegendContent onLegendItemClick={handleLegendItemClick} />} />
+                                 {Object.keys(chartConfig).map((key) => {
+                                      if (hiddenPlaylists.includes(key)) return null;
+                                      return (
+                                          <Line 
+                                              key={key}
+                                              type="monotone" 
+                                              dataKey={key}
+                                              stroke={chartConfig[key].color}
+                                              strokeWidth={2} 
+                                              dot={false}
+                                              name={chartConfig[key].label as string}
+                                          />
+                                      );
+                                  })}
                             </RechartsLineChart>
                         </ChartContainer>
                      )}

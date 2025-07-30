@@ -273,16 +273,14 @@ const ChartLegendContent = React.forwardRef<
     Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
       hideIcon?: boolean
       nameKey?: string
+      onLegendItemClick?: (dataKey: string) => void;
     }
 >(
   (
-    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey },
+    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey, onLegendItemClick },
     ref
   ) => {
     const { config } = useChart()
-    const { onClick, onMouseLeave, onMouseMove } =
-    React.useContext(RechartsPrimitive.Legend.Context)
-
 
     if (!payload?.length) {
       return null
@@ -312,8 +310,8 @@ const ChartLegendContent = React.forwardRef<
                 "cursor-pointer"
               )}
               onClick={(e) => {
-                e.preventDefault()
-                onClick?.(item, payload.indexOf(item))
+                  e.preventDefault();
+                  onLegendItemClick?.(item.dataKey as string);
               }}
             >
               {itemConfig?.icon && !hideIcon ? (
@@ -386,5 +384,3 @@ export {
   ChartStyle,
   ChartYAxis,
 }
-
-
