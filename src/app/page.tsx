@@ -147,6 +147,7 @@ export default function Dashboard() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [analyticsData, setAnalyticsData] = useState<AnalyticsDataPoint[] | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchData = async () => {
     try {
@@ -226,10 +227,21 @@ export default function Dashboard() {
     };
   }, [playlists, mediaItems, isLoading]);
 
+  const filteredMediaItems = useMemo(() => {
+    if (!searchQuery) return mediaItems;
+    return mediaItems.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  }, [mediaItems, searchQuery]);
+
+  const filteredPlaylists = useMemo(() => {
+    if (!searchQuery) return playlists;
+    return playlists.filter(playlist => playlist.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  }, [playlists, searchQuery]);
+
+
   return (
     <AuthGuard>
       <div className="flex min-h-screen w-full flex-col bg-muted/40">
-        <Header />
+        <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
           <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
             <Card>
@@ -280,12 +292,12 @@ export default function Dashboard() {
                 <ContentUploader onContentSaved={fetchData} />
                 <PlaylistManager 
                   mediaItems={mediaItems} 
-                  playlists={playlists} 
+                  playlists={filteredPlaylists} 
                   onPlaylistUpdate={fetchData}
                   isLoading={isLoading}
                 />
               </div>
-              <MediaManager mediaItems={mediaItems} onMediaUpdate={fetchData} isLoading={isLoading}/>
+              <MediaManager mediaItems={filteredMediaItems} onMediaUpdate={fetchData} isLoading={isLoading}/>
             </div>
           </div>
           

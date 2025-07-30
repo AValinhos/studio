@@ -86,6 +86,9 @@ export default function PlaylistManager({ mediaItems, playlists, onPlaylistUpdat
       } else if (playlists.length === 0) {
         setSelectedPlaylistId('');
       }
+    } else if (!isLoading && playlists.length === 0) {
+      setCurrentPlaylists([]);
+      setSelectedPlaylistId('');
     }
   }, [playlists, mediaItems, isLoading, selectedPlaylistId]);
 
@@ -96,6 +99,13 @@ export default function PlaylistManager({ mediaItems, playlists, onPlaylistUpdat
         setEditedPlaylistName(selectedPlaylist.name);
     }
   }, [selectedPlaylist]);
+
+  useEffect(() => {
+    // If the currently selected playlist is filtered out, reset the selection
+    if (selectedPlaylistId && playlists.length > 0 && !playlists.find(p => p.id === selectedPlaylistId)) {
+      setSelectedPlaylistId(playlists[0].id);
+    }
+  }, [playlists, selectedPlaylistId]);
 
   const handleAddToPlaylist = (mediaId: string) => {
     if (!selectedPlaylist) return;

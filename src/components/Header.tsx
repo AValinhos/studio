@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -15,7 +16,12 @@ import { CircleUser, Menu, Package2, Search, Tv } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation';
 
-export default function Header() {
+interface HeaderProps {
+    searchQuery: string;
+    setSearchQuery: (query: string) => void;
+}
+
+export default function Header({ searchQuery, setSearchQuery }: HeaderProps) {
   const router = useRouter();
 
   const handleLogout = () => {
@@ -67,6 +73,8 @@ export default function Header() {
               type="search"
               placeholder="Buscar conteúdo ou playlists..."
               className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </form>

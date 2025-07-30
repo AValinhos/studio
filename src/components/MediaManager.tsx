@@ -94,7 +94,7 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
 
   useEffect(() => {
     setSelectedItems([]);
-  }, [filterType]);
+  }, [filterType, mediaItems]);
   
   const handleDelete = async (itemId: string) => {
     setIsProcessing(true);
@@ -360,7 +360,7 @@ export default function MediaManager({ mediaItems, onMediaUpdate, isLoading }: M
       </CardContent>
       <CardFooter>
         <div className="text-xs text-muted-foreground">
-          Mostrando <strong>1-{filteredItems.length}</strong> de <strong>{filteredItems.length}</strong> itens
+          Mostrando <strong>1-{filteredItems.length}</strong> de <strong>{mediaItems.length}</strong> itens
         </div>
       </CardFooter>
     </Card>
