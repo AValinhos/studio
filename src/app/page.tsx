@@ -74,11 +74,11 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
 const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: AnalyticsDataPoint[], playlistNames: string[] }) => {
   useEffect(() => {
+    if (typeof window === 'undefined' || !(window as any).google || !(window as any).google.charts) {
+      return;
+    }
+
     const drawChart = () => {
-      if (typeof window === 'undefined' || !(window as any).google || !(window as any).google.visualization) {
-        return;
-      }
-      
       const data = new (window as any).google.visualization.DataTable();
       data.addColumn('string', 'Dia');
       playlistNames.forEach(name => {
@@ -87,9 +87,10 @@ const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: Anal
 
       const rows = analyticsData.map(point => {
         const date = new Date(point.date);
-        date.setDate(date.getDate() + 1);
-        const formattedDate = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-        const row = [formattedDate];
+        // Ajuste para garantir que a data seja interpretada corretamente como UTC
+        date.setUTCHours(0, 0, 0, 0);
+        const formattedDate = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' });
+        const row: (string | number)[] = [formattedDate];
         playlistNames.forEach(name => {
           row.push(point[name] || 0);
         });
@@ -109,6 +110,9 @@ const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: Anal
         titleTextStyle: {
            color: 'hsl(var(--foreground))'
         },
+        subtitleTextStyle: {
+           color: 'hsl(var(--muted-foreground))'
+        },
         legendTextStyle: {
           color: 'hsl(var(--foreground))'
         },
@@ -122,20 +126,18 @@ const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: Anal
       
       const chartElement = document.getElementById('line_chart');
       if (chartElement) {
+        // A biblioteca 'line' é para o Material Chart. Para o Classic Chart, seria 'corechart'
         const chart = new (window as any).google.charts.Line(chartElement);
         chart.draw(data, (window as any).google.charts.Line.convertOptions(options));
       }
     };
     
-    if (typeof window !== 'undefined' && (window as any).google && (window as any).google.charts) {
-      (window as any).google.charts.load('current', { packages: ['line'] });
-      (window as any).google.charts.setOnLoadCallback(drawChart);
+    // Garante que o carregamento e o callback sejam definidos apenas uma vez
+    if ((window as any).google.charts.setOnLoadCallback) {
+        (window as any).google.charts.load('current', { packages: ['line'] });
+        (window as any).google.charts.setOnLoadCallback(drawChart);
     }
-    
-    // Redesenha o gráfico se os dados mudarem e a biblioteca estiver carregada
-    if (analyticsData.length > 0 && typeof window !== 'undefined' && (window as any).google?.visualization) {
-      drawChart();
-    }
+
   }, [analyticsData, playlistNames]);
 
   return <div id="line_chart" style={{ width: '100%', minHeight: '300px' }}></div>;
