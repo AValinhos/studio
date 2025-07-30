@@ -106,6 +106,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchData();
+    
     const today = new Date().toISOString().split('T')[0];
     const lastUpdate = localStorage.getItem('lastAnalyticsUpdate');
 
@@ -116,7 +117,8 @@ export default function Dashboard() {
                 if (res.ok) {
                     localStorage.setItem('lastAnalyticsUpdate', today);
                 }
-            });
+            })
+            .catch(err => console.error("Falha ao atualizar analytics:", err));
     }
 
   }, []);
@@ -161,7 +163,7 @@ export default function Dashboard() {
     playlistNames.forEach((name, index) => {
         config[name] = {
             label: name,
-            color: `hsl(${colors[index % colors.length].slice(1)})`,
+            color: colors[index % colors.length],
         };
     });
     return config;
@@ -205,7 +207,7 @@ export default function Dashboard() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Visualizações de Conteúdo</CardTitle>
+                <CardTitle className="text-sm font-medium">Exposição de Conteúdo</CardTitle>
                 <BarChart className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -239,7 +241,7 @@ export default function Dashboard() {
                             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                         </div>
                      ) : (
-                        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+                        <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
                             <LineChart data={analyticsData} accessibilityLayer>
                                 <CartesianGrid vertical={false} />
                                 <XAxis
@@ -252,12 +254,12 @@ export default function Dashboard() {
                                 <YAxis />
                                 <ChartTooltip content={<ChartTooltipContent />} />
                                  <ChartLegend content={<ChartLegendContent />} />
-                                 {playlistNames.map((name, index) => (
+                                 {playlistNames.map((name) => (
                                     <Line 
                                         key={name}
                                         type="monotone" 
                                         dataKey={name} 
-                                        stroke={colors[index % colors.length]} 
+                                        stroke={`var(--color-${name})`}
                                         strokeWidth={2} 
                                         dot={false} 
                                     />

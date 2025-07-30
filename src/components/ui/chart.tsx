@@ -80,22 +80,16 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   return (
     <style
       dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
+        __html: `
+[data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
-    const color =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color
+    const color = itemConfig.color;
     return color ? `  --color-${key}: ${color};` : null
   })
   .join("\n")}
 }
-`
-          )
-          .join("\n"),
+`,
       }}
     />
   )
@@ -189,7 +183,7 @@ const ChartTooltipContent = React.forwardRef<
           {payload.map((item, index) => {
             const key = `${nameKey || item.name || item.dataKey || "value"}`
             const itemConfig = getPayloadConfigFromPayload(config, item, key)
-            const indicatorColor = color || item.payload.fill || item.color || item.stroke;
+            const indicatorColor = color || item.payload.fill || item.color;
             const payloadColor = itemConfig?.color || indicatorColor;
 
 
@@ -222,8 +216,8 @@ const ChartTooltipContent = React.forwardRef<
                           )}
                           style={
                             {
-                              "--color-bg": `hsl(var(${payloadColor}))`,
-                              "--color-border": `hsl(var(${payloadColor}))`,
+                              "--color-bg": payloadColor,
+                              "--color-border": payloadColor,
                             } as React.CSSProperties
                           }
                         />
@@ -291,7 +285,7 @@ const ChartLegendContent = React.forwardRef<
         {payload.map((item) => {
           const key = `${nameKey || item.dataKey || "value"}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
-          const color = itemConfig?.color || item.color
+          const color = itemConfig?.color || item.color;
 
           return (
             <div
@@ -306,7 +300,7 @@ const ChartLegendContent = React.forwardRef<
                 <div
                   className="h-2 w-2 shrink-0 rounded-[2px]"
                   style={{
-                    backgroundColor: `hsl(var(${color}))`,
+                    backgroundColor: color,
                   }}
                 />
               )}
