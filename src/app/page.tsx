@@ -76,7 +76,7 @@ const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: Anal
   
   useEffect(() => {
     if (!analyticsData || analyticsData.length === 0 || !playlistNames || playlistNames.length === 0) {
-        return; // Não renderize se não houver dados
+      return; 
     }
     
     const drawChart = () => {
@@ -135,7 +135,7 @@ const GoogleLineChart = ({ analyticsData, playlistNames }: { analyticsData: Anal
     };
     
     // @ts-ignore
-    if (typeof window.google === 'undefined') {
+    if (typeof window.google === 'undefined' || !window.google.charts) {
       return;
     }
     // @ts-ignore
@@ -303,8 +303,8 @@ export default function Dashboard() {
                     <CardDescription>Duração total (em minutos) de cada playlist ao longo dos dias.</CardDescription>
                   </CardHeader>
                   <CardContent>
-                     {isLoading ? (
-                        <div className="flex justify-center items-center h-48">
+                     {isLoading || analyticsData.length === 0 || playlistNames.length === 0 ? (
+                        <div className="flex justify-center items-center h-[300px]">
                             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                         </div>
                      ) : (
