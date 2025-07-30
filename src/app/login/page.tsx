@@ -80,7 +80,6 @@ export default function LoginPage() {
                   required 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Tissue.44"
                 />
               </div>
               <Button type="submit" className="w-full">
