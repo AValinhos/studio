@@ -273,7 +273,7 @@ const ChartLegendContent = React.forwardRef<
     Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
       hideIcon?: boolean
       nameKey?: string
-      onLegendItemClick?: (dataKey: string) => void;
+      onLegendItemClick?: (dataKey: string, e: React.MouseEvent) => void;
     }
 >(
   (
@@ -311,7 +311,7 @@ const ChartLegendContent = React.forwardRef<
               )}
               onClick={(e) => {
                   e.preventDefault();
-                  onLegendItemClick?.(item.dataKey as string);
+                  onLegendItemClick?.(item.dataKey as string, e);
               }}
             >
               {itemConfig?.icon && !hideIcon ? (
