@@ -24,6 +24,20 @@ async function writeData(data: any) {
   }
 }
 
+async function updateAnalytics() {
+    try {
+        // Esta URL precisa ser absoluta quando chamada do lado do servidor
+        const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:9002';
+        await fetch(`${baseUrl}/api/analytics`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        });
+    } catch (error) {
+        console.error("Failed to trigger analytics update:", error);
+    }
+}
+
+
 export async function GET() {
   const data = await readData();
   return NextResponse.json(data);
@@ -33,6 +47,7 @@ export async function POST(req: NextRequest) {
   try {
     const data = await readData();
     const body = await req.json();
+    let analyticsShouldUpdate = false;
 
     if (body.action === 'CREATE_MEDIA') {
       data.mediaItems.push(body.payload);
@@ -45,7 +60,9 @@ export async function POST(req: NextRequest) {
       data.mediaItems = data.mediaItems.filter((item: any) => item.id !== body.payload.id);
       // Remove the media item from any playlists it's in
       data.playlists.forEach((playlist: any) => {
+        const initialLength = playlist.items.length;
         playlist.items = playlist.items.filter((item: any) => item.mediaId !== body.payload.id);
+        if(playlist.items.length !== initialLength) analyticsShouldUpdate = true;
       });
     } else if (body.action === 'BULK_DELETE_MEDIA') {
         const idsToDelete = body.payload.ids;
@@ -53,10 +70,13 @@ export async function POST(req: NextRequest) {
         data.mediaItems = data.mediaItems.filter((item: any) => !idsToDelete.includes(item.id));
         // Remove the media items from any playlists they're in
         data.playlists.forEach((playlist: any) => {
+            const initialLength = playlist.items.length;
             playlist.items = playlist.items.filter((item: any) => !idsToDelete.includes(item.mediaId));
+            if(playlist.items.length !== initialLength) analyticsShouldUpdate = true;
         });
     } else if (body.action === 'UPDATE_PLAYLISTS') {
       data.playlists = body.payload;
+      analyticsShouldUpdate = true;
     } else if (body.action === 'CREATE_PLAYLIST') {
       const newId = data.playlists.length > 0
           ? String(Math.max(...data.playlists.map((p: any) => Number(p.id) || 0)) + 1)
@@ -66,15 +86,23 @@ export async function POST(req: NextRequest) {
           id: newId
       }
       data.playlists.push(newPlaylist);
+      analyticsShouldUpdate = true;
     } else if (body.action === 'UPDATE_PLAYLIST') {
         data.playlists = data.playlists.map((p:any) => p.id === body.payload.id ? body.payload.updates : p);
+        analyticsShouldUpdate = true;
     } else if (body.action === 'DELETE_PLAYLIST') {
         data.playlists = data.playlists.filter((p:any) => p.id !== body.payload.id);
+        analyticsShouldUpdate = true;
     } else {
         return NextResponse.json({ message: 'Ação inválida' }, { status: 400 });
     }
 
     await writeData(data);
+    
+    if (analyticsShouldUpdate) {
+        await updateAnalytics();
+    }
+
     return NextResponse.json({ message: 'Dados atualizados com sucesso', data }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ message: 'Erro ao atualizar dados', error: error.message }, { status: 500 });

@@ -10,7 +10,7 @@ import MediaManager from '@/components/MediaManager';
 import PlaylistManager from '@/components/PlaylistManager';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { BarChart, Tv, Clapperboard, ListMusic, Loader2 } from 'lucide-react';
-import { Line, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { Line, XAxis, YAxis, CartesianGrid, Legend, LineChart } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, Chart as ShadcnChart, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import type { ChartConfig } from '@/components/ui/chart';
 
@@ -42,6 +42,10 @@ export interface Playlist {
   items: PlaylistItemData[];
 }
 
+export interface AnalyticsDataPoint {
+    date: string;
+    [key: string]: any; // Permite nomes de playlist dinâmicos
+}
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -76,6 +80,7 @@ export default function Dashboard() {
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsDataPoint[]>([]);
 
   const fetchData = async () => {
     try {
@@ -85,6 +90,13 @@ export default function Dashboard() {
       const data = await res.json();
       setMediaItems(data.mediaItems || []);
       setPlaylists(data.playlists || []);
+      
+      const analyticsRes = await fetch('/api/analytics');
+      if(analyticsRes.ok) {
+        const analytics = await analyticsRes.json();
+        setAnalyticsData(analytics);
+      }
+      
     } catch (error) {
       console.error(error);
     } finally {
@@ -94,23 +106,34 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchData();
+    const today = new Date().toISOString().split('T')[0];
+    const lastUpdate = localStorage.getItem('lastAnalyticsUpdate');
+
+    if (lastUpdate !== today) {
+        // Enviar os dados de analytics do dia
+        fetch('/api/analytics', { method: 'POST' })
+            .then(res => {
+                if (res.ok) {
+                    localStorage.setItem('lastAnalyticsUpdate', today);
+                }
+            });
+    }
+
   }, []);
 
-  const { totalExposureMinutes, mostViewedItemName, playlistChartData } = useMemo(() => {
+  const { totalExposureMinutes, mostViewedItemName } = useMemo(() => {
     if (isLoading || playlists.length === 0 || mediaItems.length === 0) {
-      return { totalExposureMinutes: 0, mostViewedItemName: 'N/A', playlistChartData: [] };
+      return { totalExposureMinutes: 0, mostViewedItemName: 'N/A' };
     }
 
     const exposureCount: { [key: string]: number } = {};
     let totalSeconds = 0;
     
-    const playlistChartData = playlists.map(playlist => {
-      const playlistDuration = playlist.items.reduce((acc, item) => {
+    playlists.forEach(playlist => {
+      playlist.items.forEach(item => {
         exposureCount[item.mediaId] = (exposureCount[item.mediaId] || 0) + item.duration;
         totalSeconds += item.duration;
-        return acc + item.duration;
-      }, 0);
-      return { name: playlist.name, minutos: Math.ceil(playlistDuration / 60) };
+      });
     });
 
     let mostViewedId = '';
@@ -127,17 +150,22 @@ export default function Dashboard() {
     return {
       totalExposureMinutes: Math.ceil(totalSeconds / 60),
       mostViewedItemName: mostViewedItem ? mostViewedItem.name : "Nenhum",
-      playlistChartData,
     };
   }, [playlists, mediaItems, isLoading]);
   
-   const chartConfig = {
-    minutos: {
-      label: 'Minutos',
-      color: 'hsl(var(--primary))',
-    },
-  } satisfies ChartConfig;
+   const playlistNames = useMemo(() => playlists.map(p => p.name), [playlists]);
+   const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00C49F', '#FFBB28'];
 
+   const chartConfig = useMemo(() => {
+    const config: ChartConfig = {};
+    playlistNames.forEach((name, index) => {
+        config[name] = {
+            label: name,
+            color: colors[index % colors.length],
+        };
+    });
+    return config;
+   }, [playlistNames]);
 
   return (
     <AuthGuard>
@@ -202,8 +230,8 @@ export default function Dashboard() {
             <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-1 xl:col-span-1">
                <Card>
                   <CardHeader>
-                    <CardTitle>Duração por Playlist</CardTitle>
-                    <CardDescription>Duração total de conteúdo em cada playlist (em minutos).</CardDescription>
+                    <CardTitle>Evolução da Duração por Playlist</CardTitle>
+                    <CardDescription>Duração total (em minutos) de cada playlist ao longo dos dias.</CardDescription>
                   </CardHeader>
                   <CardContent>
                      {isLoading ? (
@@ -212,20 +240,29 @@ export default function Dashboard() {
                         </div>
                      ) : (
                         <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-                            <ShadcnChart data={playlistChartData} accessibilityLayer>
+                            <LineChart data={analyticsData} accessibilityLayer>
                                 <CartesianGrid vertical={false} />
                                 <XAxis
-                                    dataKey="name"
+                                    dataKey="date"
                                     tickLine={false}
                                     tickMargin={10}
                                     axisLine={false}
-                                    tickFormatter={(value) => value.slice(0, 3)}
+                                    tickFormatter={(value) => new Date(value).toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'})}
                                 />
                                 <YAxis />
                                 <ChartTooltip content={<ChartTooltipContent />} />
                                  <ChartLegend content={<ChartLegendContent />} />
-                                <Line type="monotone" dataKey="minutos" stroke="var(--color-minutos)" strokeWidth={2} dot={false} />
-                            </ShadcnChart>
+                                 {playlistNames.map((name, index) => (
+                                    <Line 
+                                        key={name}
+                                        type="monotone" 
+                                        dataKey={name} 
+                                        stroke={colors[index % colors.length]} 
+                                        strokeWidth={2} 
+                                        dot={false} 
+                                    />
+                                ))}
+                            </LineChart>
                         </ChartContainer>
                      )}
                   </CardContent>
