@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -9,7 +10,7 @@ import MediaManager from '@/components/MediaManager';
 import PlaylistManager from '@/components/PlaylistManager';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { BarChart, Tv, Clapperboard, ListMusic, Loader2 } from 'lucide-react';
-import { Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, Chart as ShadcnChart, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import type { ChartConfig } from '@/components/ui/chart';
 
@@ -202,7 +203,7 @@ export default function Dashboard() {
                <Card>
                   <CardHeader>
                     <CardTitle>Duração por Playlist</CardTitle>
-                    <CardDescription>Tempo total de conteúdo em cada playlist.</CardDescription>
+                    <CardDescription>Duração total de conteúdo em cada playlist (em minutos).</CardDescription>
                   </CardHeader>
                   <CardContent>
                      {isLoading ? (
@@ -223,7 +224,7 @@ export default function Dashboard() {
                                 <YAxis />
                                 <ChartTooltip content={<ChartTooltipContent />} />
                                  <ChartLegend content={<ChartLegendContent />} />
-                                <Bar dataKey="minutos" fill="var(--color-minutos)" radius={4} />
+                                <Line type="monotone" dataKey="minutos" stroke="var(--color-minutos)" strokeWidth={2} dot={false} />
                             </ShadcnChart>
                         </ChartContainer>
                      )}
